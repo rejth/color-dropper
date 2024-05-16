@@ -1,0 +1,1 @@
+<span>Selected color</span>

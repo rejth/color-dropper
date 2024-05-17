@@ -15,7 +15,7 @@ const EXCLUDED_SETTERS: Array<keyof HitCanvasRenderingContext2D> = [
 
 export function createHitCanvas(
   canvas: HTMLCanvasElement,
-  contextSettings: CanvasRenderingContext2DSettings | undefined
+  contextSettings: CanvasRenderingContext2DSettings | undefined,
 ): HitCanvasRenderingContext2D {
   const ctx = canvas.getContext('2d', contextSettings);
 

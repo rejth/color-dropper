@@ -1,35 +1,51 @@
 <script lang="ts">
-  import { onDestroy, onMount, setContext } from 'svelte';
+  import { createEventDispatcher, getContext, onMount } from 'svelte';
+
   import {
     type HitCanvasRenderingContext2D,
     type OriginalEvent,
-    RenderManager,
     type Context,
     KEY,
-  } from '../lib/';
+    getMaxPixelRatio,
+    type ResizeEvent,
+  } from '../lib';
 
-  export let width: number;
-  export let height: number;
-  export let className: string;
+  export let width: number | null = null;
+  export let height: number | null = null;
+  export let pixelRatio: 'auto' | number | null = null;
+  export let contextSettings: CanvasRenderingContext2DSettings | undefined = undefined;
+  export let style = '';
 
-  export const getCanvasElement = (): HTMLCanvasElement => canvas;
+  export const getCanvasElement = (): HTMLCanvasElement => canvasRef;
   export const getCanvasContext = (): HitCanvasRenderingContext2D | null => renderManager.hitCtx;
 
-  const renderManager = new RenderManager();
-  let canvas: HTMLCanvasElement;
+  const { renderManager } = getContext<Context>(KEY);
+  const { geometryManager } = renderManager;
 
-  setContext<Context>(KEY, {
-    renderManager,
-  });
+  const dispatch = createEventDispatcher<ResizeEvent>();
+
+  let canvasRef: HTMLCanvasElement;
+  let canvasWidth: number;
+  let canvasHeight: number;
+  let devicePixelRatio: number | undefined;
+  let maxPixelRatio: number | undefined;
 
   onMount(() => {
-    renderManager.init(canvas);
+    renderManager.init(canvasRef, contextSettings);
     drawImage();
   });
 
-  onDestroy(() => {
-    renderManager.destroy();
-  });
+  const resize = (node: Element) => {
+    const canvasObserver = new ResizeObserver(([{ contentRect }]) => {
+      canvasWidth = contentRect.width;
+      canvasHeight = contentRect.height;
+    });
+    canvasObserver.observe(node);
+
+    return {
+      destroy: () => canvasObserver.disconnect(),
+    };
+  };
 
   const drawImage = () => {
     const image = new Image();
@@ -47,15 +63,107 @@
   const handleClick = (e: OriginalEvent) => {
     renderManager.handlePick(e);
   };
+
+  $: _width = width ?? canvasWidth ?? 0;
+  $: _height = height ?? canvasHeight ?? 0;
+
+  $: if (devicePixelRatio && pixelRatio === 'auto') {
+    maxPixelRatio = getMaxPixelRatio(_width, _height, devicePixelRatio);
+  } else {
+    maxPixelRatio = undefined;
+  }
+
+  $: _pixelRatio = maxPixelRatio ?? <number>pixelRatio ?? devicePixelRatio ?? 2;
+
+  $: renderManager.width = _width;
+  $: renderManager.height = _height;
+  $: renderManager.pixelRatio = _pixelRatio;
+  $: geometryManager.pixelRatio = _pixelRatio;
+
+  $: _width, _height, _pixelRatio, renderManager.redraw();
+
+  $: dispatch('resize', {
+    width: _width,
+    height: _height,
+    pixelRatio: _pixelRatio,
+  });
 </script>
 
+<svelte:window bind:devicePixelRatio />
+
 <canvas
-  {width}
-  {height}
-  class={className}
-  bind:this={canvas}
-  on:click={handleClick}
+  {style}
+  class="canvas"
+  width={_width * _pixelRatio}
+  height={_height * _pixelRatio}
+  style:width={width ? `${width}px` : '100%'}
+  style:height={height ? `${height}px` : '100%'}
+  use:resize
+  bind:this={canvasRef}
+  bind:clientWidth={canvasWidth}
+  bind:clientHeight={canvasHeight}
+  on:mousedown={handleClick}
+  on:mouseup
   on:mousemove={handleMove}
+  on:mouseenter
+  on:mouseleave
+  on:pointerdown={handleClick}
+  on:pointerup
+  on:pointerenter
+  on:pointerleave
   on:pointermove={handleMove}
+  on:pointercancel
+  on:touchstart={handleClick}
+  on:touchend
   on:touchmove={handleMove}
+  on:touchcancel
+  on:click
+  on:dblclick
+  on:wheel
+  on:focus
+  on:blur
+  on:contextmenu
+  on:fullscreenchange
+  on:fullscreenerror
+  on:scroll
+  on:cut
+  on:copy
+  on:paste
+  on:keydown
+  on:keypress
+  on:keyup
+  on:auxclick
+  on:click
+  on:contextmenu
+  on:dblclick
+  on:mousedown
+  on:mouseenter
+  on:mouseleave
+  on:mousemove
+  on:mouseover
+  on:mouseout
+  on:mouseup
+  on:select
+  on:wheel
+  on:drag
+  on:dragend
+  on:dragenter
+  on:dragstart
+  on:dragleave
+  on:dragover
+  on:drop
+  on:touchcancel
+  on:touchend
+  on:touchmove
+  on:touchstart
+  on:pointerover
+  on:pointerenter
+  on:pointerdown
+  on:pointermove
+  on:pointerup
+  on:pointercancel
+  on:pointerout
+  on:pointerleave
+  on:gotpointercapture
+  on:lostpointercapture
 />

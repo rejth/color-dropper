@@ -1,17 +1,36 @@
-import { pickColor, type HitCanvasRenderingContext2D } from '.';
+import { rgbToHex, type HEX, type HitCanvasRenderingContext2D } from '.';
 
-const options: CanvasRenderingContext2DSettings = {
+const settings: CanvasRenderingContext2DSettings = {
   willReadFrequently: true,
 };
 
-const EXCLUDED_SETTERS: Array<keyof HitCanvasRenderingContext2D> = ['globalAlpha'];
+const EXCLUDED_SETTERS: Array<keyof HitCanvasRenderingContext2D> = [
+  'filter',
+  'shadowBlur',
+  'globalCompositeOperation',
+  'globalAlpha',
+  'fillStyle',
+  'strokeStyle',
+];
 
 export function createHitCanvas(
   canvas: HTMLCanvasElement,
-  hitCanvas: OffscreenCanvas,
+  contextSettings: CanvasRenderingContext2DSettings | undefined
 ): HitCanvasRenderingContext2D {
-  const ctx = canvas.getContext('2d');
-  const hitCtx = hitCanvas.getContext('2d', options) as unknown as HitCanvasRenderingContext2D;
+  const ctx = canvas.getContext('2d', contextSettings);
+
+  const hitCanvas = new OffscreenCanvas(canvas.width, canvas.height);
+  const hitCtx = hitCanvas.getContext('2d', settings) as unknown as HitCanvasRenderingContext2D;
+
+  const hitCanvasObserver = new MutationObserver(() => {
+    hitCanvas.width = canvas.width;
+    hitCanvas.height = canvas.height;
+  });
+  hitCanvasObserver.observe(canvas, { attributeFilter: ['width', 'height'] });
+
+  const pickColor = (x: number, y: number): HEX => {
+    return rgbToHex(hitCtx.getImageData(x, y, 1, 1).data);
+  };
 
   return new Proxy(ctx as unknown as HitCanvasRenderingContext2D, {
     get(targetCtx, property: keyof HitCanvasRenderingContext2D) {

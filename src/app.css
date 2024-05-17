@@ -9,6 +9,10 @@
   -moz-osx-font-smoothing: grayscale;
 }
 
+* {
+  box-sizing: border-box;
+}
+
 a {
   font-weight: 500;
   color: #646cff;
@@ -35,5 +39,4 @@ h1 {
 #app {
   margin: 0 auto;
   padding: 2rem;
-  text-align: center;
 }

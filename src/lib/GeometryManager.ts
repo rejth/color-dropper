@@ -1,20 +1,47 @@
 import type { OriginalEvent, Point } from './types';
 
 export class GeometryManager {
+  pixelRatio: number = 0;
   defaultPoint: Point = { x: 0, y: 0 };
 
-  getMousePosition(e: MouseEvent | PointerEvent, rect: DOMRect): Point {
+  getMouseCoordinates(e: MouseEvent | PointerEvent): Point {
     return {
-      x: e.clientX - rect.left,
-      y: e.clientY - rect.top,
+      x: e.clientX,
+      y: e.clientY,
+    };
+  }
+
+  getTouchCoordinates(e: TouchEvent): Point {
+    const { clientX, clientY } = e.changedTouches[0];
+    return {
+      x: clientX,
+      y: clientY,
+    };
+  }
+
+  getCoordinates(e: OriginalEvent): Point {
+    if (window.TouchEvent && e instanceof TouchEvent) {
+      return this.getTouchCoordinates(e);
+    } else if (e instanceof MouseEvent || e instanceof PointerEvent) {
+      return this.getMouseCoordinates(e);
+    }
+
+    return this.defaultPoint;
+  }
+
+  getMousePosition(e: MouseEvent | PointerEvent, rect: DOMRect): Point {
+    const { x, y } = this.getMouseCoordinates(e);
+    return {
+      x: (x - rect.left) * this.pixelRatio,
+      y: (y - rect.top) * this.pixelRatio,
     };
   }
 
   getTouchPosition(e: TouchEvent, rect: DOMRect): Point {
-    const { clientX, clientY } = e.changedTouches[0];
+    const { x, y } = this.getTouchCoordinates(e);
     return {
-      x: clientX - rect.left,
-      y: clientY - rect.top,
+      x: (x - rect.left) * this.pixelRatio,
+      y: (y - rect.top) * this.pixelRatio,
     };
   }
 

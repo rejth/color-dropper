@@ -1,65 +1,64 @@
+import { writable, type Writable } from 'svelte/store';
 import {
   createHitCanvas,
   GeometryManager,
+  WHITE,
+  type CursorState,
   type HitCanvasRenderingContext2D,
   type OriginalEvent,
 } from '.';
 
 export class RenderManager {
-  canvas: HTMLCanvasElement| null = null;
+  width?: number;
+  height?: number;
+  pixelRatio?: number;
+  imageData?: ImageData;
 
-  hitCtx: HitCanvasRenderingContext2D | null = null;
+  selectedColor: Writable<string> = writable(WHITE);
+  cursor: Writable<CursorState> = writable({ x: 0, y: 0, color: WHITE });
 
-  hitCanvasObserver: MutationObserver | undefined;
-
+  hitCtx: HitCanvasRenderingContext2D | null;
   geometryManager: GeometryManager;
 
-  imageData: ImageData | undefined
-
-  constructor() {
-    this.geometryManager = new GeometryManager();
+  constructor(geometryManager: GeometryManager) {
+    this.hitCtx = null;
+    this.geometryManager = geometryManager;
   }
 
-  init(canvas: HTMLCanvasElement) {
-    const hitCanvas = new OffscreenCanvas(canvas.width, canvas.height);
-
-    this.hitCanvasObserver = new MutationObserver(() => {
-      hitCanvas.width = canvas.width;
-      hitCanvas.height = canvas.height;
-    });
-
-    this.hitCanvasObserver.observe(canvas, { attributeFilter: ['width', 'height'] });
-    this.hitCtx = createHitCanvas(canvas, hitCanvas);
-    this.canvas = canvas;
+  init(canvas: HTMLCanvasElement, contextSettings: CanvasRenderingContext2DSettings | undefined) {
+    this.hitCtx = createHitCanvas(canvas, contextSettings);
   }
 
   render() {}
 
+  redraw() {}
+
   clearRect(width: number, height: number) {
-    if (!this.hitCtx) return;
-    this.hitCtx.clearRect(0, 0, width, height);
+    this.hitCtx?.clearRect(0, 0, width, height);
   }
 
   async drawImage(image: HTMLImageElement) {
-    if (!this.hitCtx || !this.canvas) return;
-    const { width, height } = this.canvas
-
+    const ctx = this.hitCtx!;
+    const width = this.width!;
+    const height = this.height!;
     const imageBitmap = await createImageBitmap(image);
 
     this.clearRect(width, height);
-    this.hitCtx.drawImage(imageBitmap, 0, 0, width, height);
-    this.imageData = this.hitCtx.getImageData(0, 0, width, height);
+    ctx.drawImage(imageBitmap, 0, 0, width, height);
+    this.imageData = ctx.getImageData(0, 0, width, height);
   }
 
   handlePick(e: OriginalEvent) {
     const { x, y } = this.geometryManager.calculatePosition(e);
+    const hexCode = this.hitCtx!.pickColor(x, y);
+    this.selectedColor.set(hexCode);
   }
 
   handleMove(e: OriginalEvent) {
     const { x, y } = this.geometryManager.calculatePosition(e);
-  }
+    const hexCode = this.hitCtx!.pickColor(x, y);
 
-  destroy() {
-    this.hitCanvasObserver?.disconnect();
+    const pointerPosition = this.geometryManager.getCoordinates(e);
+    this.cursor.set({ x: pointerPosition.x, y: pointerPosition.y, color: hexCode });
   }
 }

@@ -28,7 +28,7 @@
   };
 </script>
 
-<main>
+<div class="color-dropper">
   <div class="toolbar">
     <span tabindex="0" role="button" class="tool" on:click={() => {}} on:keydown={() => {}}>
       <span class="icon" class:active={true} title="Color picker">
@@ -37,25 +37,26 @@
     </span>
     <strong class="selected-color">{$selectedColor}</strong>
   </div>
-  <div>
-    <Canvas
-      width={window.innerWidth}
-      height={window.innerHeight}
-      contextSettings={settings}
-      style="cursor: {isEntered ? 'none' : 'default'}"
-      on:mouseenter={onEnter}
-      on:mouseleave={onLeave}
-      on:pointerenter={onEnter}
-      on:pointerleave={onLeave}
-    />
-  </div>
+  <Canvas
+    width={window.innerWidth}
+    height={window.innerHeight}
+    contextSettings={settings}
+    style="cursor: {isEntered ? 'none' : 'default'}"
+    on:mouseenter={onEnter}
+    on:mouseleave={onLeave}
+    on:pointerenter={onEnter}
+    on:pointerleave={onLeave}
+  />
   <ColorCircle isActive={isEntered} />
-</main>
+</div>
 
 <style>
+  .color-dropper {
+    width: 100%;
+    height: calc(100vh - 2em);
+  }
+
   .toolbar {
-    top: 3rem;
-    left: 50%;
     display: flex;
     flex-direction: row;
     align-items: center;

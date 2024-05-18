@@ -8,7 +8,7 @@
   const { cursor } = renderManager;
 </script>
 
-<div class="cursor-container" class:active={isActive}>
+<div class="cursor-wrapper" class:active={isActive}>
   <div
     class="cursor"
     class:active={isActive}
@@ -45,7 +45,7 @@
 </div>
 
 <style>
-  .cursor-container {
+  .cursor-wrapper {
     display: none;
     position: fixed;
     top: 0;

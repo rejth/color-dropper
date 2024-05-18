@@ -1,7 +1,7 @@
 import type { OriginalEvent, Point } from './types';
 
 export class GeometryManager {
-  pixelRatio: number = 0;
+  pixelRatio: number = 2;
   defaultPoint: Point = { x: 0, y: 0 };
 
   getMouseCoordinates(e: MouseEvent | PointerEvent): Point {

@@ -1,11 +1,14 @@
 import { writable, type Writable } from 'svelte/store';
 import {
+  BLACK,
   createHitCanvas,
   GeometryManager,
   WHITE,
   type CursorState,
   type HitCanvasRenderingContext2D,
+  type LayerId,
   type OriginalEvent,
+  type Render,
 } from '.';
 
 export class RenderManager {
@@ -14,51 +17,78 @@ export class RenderManager {
   pixelRatio?: number;
   imageData?: ImageData;
 
-  selectedColor: Writable<string> = writable(WHITE);
-  cursor: Writable<CursorState> = writable({ x: 0, y: 0, color: WHITE });
+  needsRedraw: boolean;
+  frame: number | undefined;
+  drawers: Map<LayerId, Render> = new Map();
+  selectedColor: Writable<string> = writable(BLACK);
+  cursor: Writable<CursorState> = writable({ x: 0, y: 0, color: BLACK });
 
-  hitCtx: HitCanvasRenderingContext2D | null;
+  ctx: HitCanvasRenderingContext2D | null;
   geometryManager: GeometryManager;
 
   constructor(geometryManager: GeometryManager) {
-    this.hitCtx = null;
+    this.ctx = null;
+    this.needsRedraw = true;
     this.geometryManager = geometryManager;
+
+    this.render = this.render.bind(this);
   }
 
   init(canvas: HTMLCanvasElement, contextSettings: CanvasRenderingContext2DSettings | undefined) {
-    this.hitCtx = createHitCanvas(canvas, contextSettings);
+    this.ctx = createHitCanvas(canvas, contextSettings);
+    this.startRenderLoop();
   }
 
-  render() {}
-
-  redraw() {}
-
-  clearRect(width: number, height: number) {
-    this.hitCtx?.clearRect(0, 0, width, height);
+  startRenderLoop() {
+    this.render();
+    this.frame = requestAnimationFrame(() => this.startRenderLoop());
   }
 
-  async drawImage(image: HTMLImageElement) {
-    const ctx = this.hitCtx!;
+  addDrawer(layerId: LayerId, render: Render) {
+    this.drawers.set(layerId, render);
+  }
+
+  removeDrawer(layerId: LayerId) {
+    this.drawers.delete(layerId);
+  }
+
+  render() {
+    const ctx = this.ctx!;
     const width = this.width!;
     const height = this.height!;
-    const imageBitmap = await createImageBitmap(image);
+    const pixelRatio = this.pixelRatio!;
 
-    this.clearRect(width, height);
-    ctx.drawImage(imageBitmap, 0, 0, width, height);
-    this.imageData = ctx.getImageData(0, 0, width, height);
+    if (this.needsRedraw) {
+      ctx.setTransform(pixelRatio, 0, 0, pixelRatio, 0, 0);
+      this.needsRedraw = false;
+    }
+
+    ctx.clearRect(0, 0, width, height);
+
+    this.drawers.forEach((draw) => {
+      draw({ ctx, width, height });
+    });
+  }
+
+  redraw() {
+    this.needsRedraw = true;
   }
 
   handlePick(e: OriginalEvent) {
     const { x, y } = this.geometryManager.calculatePosition(e);
-    const hexCode = this.hitCtx!.pickColor(x, y);
+    const hexCode = this.ctx!.pickColor(x, y);
     this.selectedColor.set(hexCode);
   }
 
   handleMove(e: OriginalEvent) {
     const { x, y } = this.geometryManager.calculatePosition(e);
-    const hexCode = this.hitCtx!.pickColor(x, y);
+    const hexCode = this.ctx!.pickColor(x, y);
 
-    const pointerPosition = this.geometryManager.getCoordinates(e);
-    this.cursor.set({ x: pointerPosition.x, y: pointerPosition.y, color: hexCode });
+    const cursorPosition = this.geometryManager.getCoordinates(e);
+    this.cursor.set({ x: cursorPosition.x, y: cursorPosition.y, color: hexCode });
+  }
+
+  destroy() {
+    cancelAnimationFrame(this.frame!);
   }
 }

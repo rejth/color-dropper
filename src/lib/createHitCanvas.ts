@@ -5,12 +5,9 @@ const settings: CanvasRenderingContext2DSettings = {
 };
 
 const EXCLUDED_SETTERS: Array<keyof HitCanvasRenderingContext2D> = [
-  'filter',
   'shadowBlur',
   'globalCompositeOperation',
   'globalAlpha',
-  'fillStyle',
-  'strokeStyle',
 ];
 
 export function createHitCanvas(

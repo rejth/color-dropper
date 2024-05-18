@@ -1,5 +1,5 @@
 import canvasSize from 'canvas-size';
-import type { HEX } from '.';
+import type { HEX, RGB } from '.';
 
 type F = (...args: unknown[]) => void;
 

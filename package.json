@@ -25,6 +25,7 @@
     "@sveltejs/vite-plugin-svelte": "^3.1.0",
     "@tsconfig/svelte": "^5.0.4",
     "@types/canvas-size": "^1.2.2",
+    "@types/uuid": "^9",
     "@typescript-eslint/eslint-plugin": "^7.9.0",
     "@typescript-eslint/parser": "^7.9.0",
     "eslint": "^9.3.0",
@@ -43,6 +44,7 @@
   },
   "packageManager": "yarn@4.0.2",
   "dependencies": {
-    "canvas-size": "^2.0.0"
+    "canvas-size": "^2.0.0",
+    "uuid": "^9.0.1"
   }
 }

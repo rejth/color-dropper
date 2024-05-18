@@ -25,9 +25,11 @@ export type ResizeEvent = {
   };
 };
 
+export type LayerId = string;
 export type Point = Pick<DOMRect, 'x' | 'y'>;
+export type RGB = [number, number, number];
 export type HEX = string;
-export type RenderProps = { ctx: HitCanvasRenderingContext2D };
+export type RenderProps = { ctx: HitCanvasRenderingContext2D; width: number; height: number };
 export type OriginalEvent = MouseEvent | PointerEvent | TouchEvent;
 export type CanvasEvents =
   | 'click'

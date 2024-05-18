@@ -1,6 +1,5 @@
 <script lang="ts">
   import { createEventDispatcher, getContext, onMount } from 'svelte';
-
   import {
     type HitCanvasRenderingContext2D,
     type OriginalEvent,
@@ -14,10 +13,11 @@
   export let height: number | null = null;
   export let pixelRatio: 'auto' | number | null = null;
   export let contextSettings: CanvasRenderingContext2DSettings | undefined = undefined;
+  export let isActive = true;
   export let style = '';
 
   export const getCanvasElement = (): HTMLCanvasElement => canvasRef;
-  export const getCanvasContext = (): HitCanvasRenderingContext2D | null => renderManager.hitCtx;
+  export const getCanvasContext = (): HitCanvasRenderingContext2D | null => renderManager.ctx;
 
   const { renderManager } = getContext<Context>(KEY);
   const { geometryManager } = renderManager;
@@ -32,7 +32,7 @@
 
   onMount(() => {
     renderManager.init(canvasRef, contextSettings);
-    drawImage();
+    return () => renderManager.destroy();
   });
 
   const resize = (node: Element) => {
@@ -47,20 +47,11 @@
     };
   };
 
-  const drawImage = () => {
-    const image = new Image();
-    image.src = 'images/image.jpg';
-
-    image.onload = async () => {
-      await renderManager.drawImage(image);
-    };
-  };
-
-  const handleMove = (e: OriginalEvent) => {
+  const onMove = (e: OriginalEvent) => {
     renderManager.handleMove(e);
   };
 
-  const handleClick = (e: OriginalEvent) => {
+  const onClick = (e: OriginalEvent) => {
     renderManager.handlePick(e);
   };
 
@@ -94,6 +85,7 @@
 <canvas
   {style}
   class="canvas"
+  class:active={isActive}
   width={_width * _pixelRatio}
   height={_height * _pixelRatio}
   style:width={width ? `${width}px` : '100%'}
@@ -102,20 +94,20 @@
   bind:this={canvasRef}
   bind:clientWidth={canvasWidth}
   bind:clientHeight={canvasHeight}
-  on:mousedown={handleClick}
+  on:mousedown={onClick}
   on:mouseup
-  on:mousemove={handleMove}
+  on:mousemove={onMove}
   on:mouseenter
   on:mouseleave
-  on:pointerdown={handleClick}
+  on:pointerdown={onClick}
   on:pointerup
   on:pointerenter
   on:pointerleave
-  on:pointermove={handleMove}
+  on:pointermove={onMove}
   on:pointercancel
-  on:touchstart={handleClick}
+  on:touchstart={onClick}
   on:touchend
-  on:touchmove={handleMove}
+  on:touchmove={onMove}
   on:touchcancel
   on:click
   on:dblclick
@@ -167,3 +159,19 @@
   on:gotpointercapture
   on:lostpointercapture
 />
+
+<slot />
+
+<style>
+  .canvas {
+    pointer-events: none;
+    touch-action: none;
+    cursor: default;
+  }
+
+  .active {
+    pointer-events: all;
+    touch-action: auto;
+    cursor: none;
+  }
+</style>

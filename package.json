@@ -42,9 +42,9 @@
     "typescript": "^5.4.5",
     "vite": "^5.2.11"
   },
-  "packageManager": "yarn@4.2.2",
   "dependencies": {
     "canvas-size": "^2.0.0",
+    "json-fn": "^1.1.1",
     "uuid": "^9.0.1"
   }
 }

@@ -84,7 +84,7 @@ export class RenderManager {
   }
 
   handlePick(e: OriginalEvent) {
-    if (!this.imageData || !this.width) return;
+    if (!this.imageData) return;
 
     const { x, y } = this.geometryManager.calculatePosition(e);
     const hexCode = this.context!.pickColor(x, y, this.imageData.data);
@@ -92,7 +92,7 @@ export class RenderManager {
   }
 
   handleMove(e: OriginalEvent) {
-    if (!this.imageData || !this.width) return;
+    if (!this.imageData) return;
 
     const { x, y } = this.geometryManager.calculatePosition(e);
     const hexCode = this.context!.pickColor(x, y, this.imageData.data);

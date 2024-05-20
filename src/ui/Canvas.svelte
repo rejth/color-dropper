@@ -1,7 +1,6 @@
 <script lang="ts">
   import { createEventDispatcher, getContext, onMount } from 'svelte';
   import {
-    type HitCanvasRenderingContext2D,
     type OriginalEvent,
     type Context,
     type ResizeEvent,
@@ -17,7 +16,6 @@
   export let style = '';
 
   export const getCanvasElement = (): HTMLCanvasElement => canvasRef;
-  export const getCanvasContext = (): HitCanvasRenderingContext2D | null => renderManager.context;
 
   const { renderManager } = getContext<Context>(KEY);
   const { geometryManager } = renderManager;

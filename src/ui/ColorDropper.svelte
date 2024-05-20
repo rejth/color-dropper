@@ -6,6 +6,7 @@
   import ColorPicker from './ColorPicker.svelte';
   import ColorCircle from './ColorCircle.svelte';
   import { RenderManager, type Context, KEY, GeometryManager } from '../lib';
+  import { RenderWorker } from '../lib/RenderWorker';
 
   const renderManager = new RenderManager(new GeometryManager());
   const { selectedColor } = renderManager;
@@ -60,7 +61,12 @@
     {#each images as image}
       <Layer
         render={({ ctx, width, height }) => {
-          ctx.drawImage(image, 0, 0, width, height);
+          const bounds = { x0: 160, y0: 160, x1: 480, y1: 480 };
+          let { x0, y0, x1, y1 } = bounds;
+          ctx.globalAlpha = 0.9;
+          ctx.fillStyle = 'tomato';
+          ctx.fillRect(x0, y0, x1 - x0, y1 - y0);
+          ctx.globalAlpha = 1;
         }}
       />
     {/each}

@@ -1,7 +1,8 @@
 import type { RenderManager } from '.';
+import type { RenderWorker } from './RenderWorker';
 
 export type Context = {
-  renderManager: RenderManager;
+  renderManager: RenderManager | RenderWorker;
 };
 
 export type LayerId = string;
@@ -15,7 +16,7 @@ export interface Render {
 }
 
 export type RenderProps = {
-  ctx: HitCanvasRenderingContext2D;
+  ctx: HitCanvasRenderingContext2D | OffscreenCanvasRenderingContext2D;
   width: number;
   height: number;
 };
@@ -37,3 +38,26 @@ export type ResizeEvent = {
     pixelRatio: number;
   };
 };
+
+export type WorkerAction = 'init' | 'resize' | 'update' | 'getColor' | 'pickColor'
+
+export enum WorkerActionEnum {
+  INIT = 'init',
+  RESIZE = 'resize',
+  UPDATE = 'update',
+  GET_COLOR = 'getColor',
+  PICK_COLOR = 'pickColor',
+}
+
+export type WorkerEvent = {
+  action: WorkerAction,
+  canvas: OffscreenCanvas,
+  drawers: string,
+  x: number,
+  y: number,
+  width: number,
+  height: number,
+  pixelRatio: number,
+  cursorPosition: Point,
+  color: HEX,
+}

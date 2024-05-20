@@ -2,7 +2,6 @@ import { rgbToHex, type HEX, type HitCanvasRenderingContext2D } from '.';
 
 const offscreeSettings: CanvasRenderingContext2DSettings = {
   willReadFrequently: true,
-  alpha: false,
 };
 
 const EXCLUDED_SETTERS: Array<keyof HitCanvasRenderingContext2D> = [

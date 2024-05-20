@@ -3,7 +3,7 @@ import type { HEX, RGB } from '.';
 
 type F = (...args: unknown[]) => void;
 
-export function rgbToHex([r, g, b]: Uint8ClampedArray): HEX {
+export function rgbToHex([r, g, b]: Uint8ClampedArray | RGB): HEX {
   return '#' + ((1 << 24) + (r << 16) + (g << 8) + b).toString(16).slice(1).toUpperCase();
 }
 

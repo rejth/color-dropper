@@ -20,7 +20,7 @@
 
   onMount(async () => {
     const image = new Image();
-    image.src = 'images/image.jpg';
+    image.src = 'images/leaves.jpg';
 
     image.onload = async () => {
       const imageBitmap = await createImageBitmap(image);

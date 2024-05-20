@@ -3,7 +3,6 @@ import {
   BLACK,
   createHitCanvas,
   GeometryManager,
-  WHITE,
   type CursorState,
   type HitCanvasRenderingContext2D,
   type LayerId,
@@ -15,27 +14,31 @@ export class RenderManager {
   width?: number;
   height?: number;
   pixelRatio?: number;
-  imageData?: ImageData;
+  frame?: number;
 
+  context: HitCanvasRenderingContext2D | null;
+  geometryManager: GeometryManager;
+
+  imageData: ImageData | null;
+  drawers: Map<LayerId, Render>;
   needsRedraw: boolean;
-  frame: number | undefined;
-  drawers: Map<LayerId, Render> = new Map();
+  needsCacheImage: boolean;
+
   selectedColor: Writable<string> = writable(BLACK);
   cursor: Writable<CursorState> = writable({ x: 0, y: 0, color: BLACK });
 
-  ctx: HitCanvasRenderingContext2D | null;
-  geometryManager: GeometryManager;
-
   constructor(geometryManager: GeometryManager) {
-    this.ctx = null;
+    this.context = null;
+    this.imageData = null;
+    this.drawers = new Map();
     this.needsRedraw = true;
+    this.needsCacheImage = true;
     this.geometryManager = geometryManager;
-
     this.render = this.render.bind(this);
   }
 
   init(canvas: HTMLCanvasElement, contextSettings: CanvasRenderingContext2DSettings | undefined) {
-    this.ctx = createHitCanvas(canvas, contextSettings);
+    this.context = createHitCanvas(canvas, contextSettings);
     this.startRenderLoop();
   }
 
@@ -53,36 +56,46 @@ export class RenderManager {
   }
 
   render() {
-    const ctx = this.ctx!;
+    const context = this.context!;
     const width = this.width!;
     const height = this.height!;
     const pixelRatio = this.pixelRatio!;
 
     if (this.needsRedraw) {
-      ctx.setTransform(pixelRatio, 0, 0, pixelRatio, 0, 0);
+      context.setTransform(pixelRatio, 0, 0, pixelRatio, 0, 0);
       this.needsRedraw = false;
     }
 
-    ctx.clearRect(0, 0, width, height);
+    context.clearRect(0, 0, width, height);
 
     this.drawers.forEach((draw) => {
-      draw({ ctx, width, height });
+      draw({ ctx: context, width, height });
     });
+
+    if (this.needsCacheImage && width > 0 && height > 0) {
+      this.imageData = context.getImageData(0, 0, width * pixelRatio, height * pixelRatio);
+      this.needsCacheImage = false;
+    }
   }
 
   redraw() {
     this.needsRedraw = true;
+    this.needsCacheImage = true;
   }
 
   handlePick(e: OriginalEvent) {
+    if (!this.imageData || !this.width) return;
+
     const { x, y } = this.geometryManager.calculatePosition(e);
-    const hexCode = this.ctx!.pickColor(x, y);
+    const hexCode = this.context!.pickColor(x, y, this.imageData.data);
     this.selectedColor.set(hexCode);
   }
 
   handleMove(e: OriginalEvent) {
+    if (!this.imageData || !this.width) return;
+
     const { x, y } = this.geometryManager.calculatePosition(e);
-    const hexCode = this.ctx!.pickColor(x, y);
+    const hexCode = this.context!.pickColor(x, y, this.imageData.data);
 
     const cursorPosition = this.geometryManager.getCoordinates(e);
     this.cursor.set({ x: cursorPosition.x, y: cursorPosition.y, color: hexCode });

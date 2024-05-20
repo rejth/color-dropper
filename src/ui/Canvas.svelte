@@ -4,9 +4,9 @@
     type HitCanvasRenderingContext2D,
     type OriginalEvent,
     type Context,
-    KEY,
-    getMaxPixelRatio,
     type ResizeEvent,
+    getMaxPixelRatio,
+    KEY,
   } from '../lib';
 
   export let width: number | null = null;
@@ -17,7 +17,7 @@
   export let style = '';
 
   export const getCanvasElement = (): HTMLCanvasElement => canvasRef;
-  export const getCanvasContext = (): HitCanvasRenderingContext2D | null => renderManager.ctx;
+  export const getCanvasContext = (): HitCanvasRenderingContext2D | null => renderManager.context;
 
   const { renderManager } = getContext<Context>(KEY);
   const { geometryManager } = renderManager;

@@ -71,15 +71,6 @@
     height: _height,
     pixelRatio: _pixelRatio,
   });
-
-  const handleLayerTouchStart = (e: TouchEvent) => {
-    const { clientX, clientY } = e.changedTouches[0];
-    const { left, top } = (<Element>e.target).getBoundingClientRect();
-    const x = (clientX - left) * _pixelRatio;
-    const y = (clientY - top) * _pixelRatio;
-    const hexCode = renderManager.context.pickColor(x, y);
-    renderManager.selectedColor.set(hexCode);
-  };
 </script>
 
 <svelte:window bind:devicePixelRatio />
@@ -96,7 +87,7 @@
   bind:this={canvasRef}
   bind:clientWidth={canvasWidth}
   bind:clientHeight={canvasHeight}
-  on:touchstart={handleLayerTouchStart}
+  on:touchstart={onClick}
   on:touchmove={onMove}
   on:mousedown={onClick}
   on:mousemove={onMove}

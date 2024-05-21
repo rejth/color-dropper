@@ -2,7 +2,7 @@ import { type HEX, type HitCanvasRenderingContext2D } from '.';
 import { pickColor } from '../lib';
 
 /**
- * Offscreen canvas settings for rendering optimization
+ * Offscreen canvas settings for rendering optimization.
  */
 const settings: CanvasRenderingContext2DSettings = {
   willReadFrequently: true,
@@ -19,7 +19,8 @@ const EXCLUDED_SETTERS: Array<keyof HitCanvasRenderingContext2D> = [
 /**
  * Under the hood, we proxy all CanvasRenderingContext2D methods to a second, offscreen canvas.
  * When an event occurs on the main canvas, the color of the pixel at the event coordinates is read from the offscreen canvas and converted to HEX color code.
- * This approach can also be useful for identifying the corresponding layer using a unique fill and stroke color and then re-dispatch an event to the Layer component.
+ * Multiple layered canvases for complex scenes is a possible optimization when some objects need to move or change frequently, while others remain relatively static.
+ * Also, this approach can be useful for identifying the corresponding layer using a unique fill and stroke color and then re-dispatch an event to the Layer component.
  */
 export function createHitCanvas(
   canvas: HTMLCanvasElement,

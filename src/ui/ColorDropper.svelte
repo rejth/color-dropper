@@ -8,11 +8,26 @@
   import { RenderManager, RenderWorker, type AppContext, GeometryManager } from '../model';
   import { KEY } from '../lib';
 
+  /**
+   * When unset, the canvas will use its clientWidth property.
+   */
   export let width: number | null = null;
+  /**
+   * When unset, the canvas will use its clientHeight property.
+   */
   export let height: number | null = null;
+  /**
+   * If pixelRatio is unset, the canvas uses devicePixelRatio binding to match the window’s pixel dens.
+   * If pixelRatio is set to "auto", the canvas-size library is used to automatically calculate the maximum supported pixel ratio based on the browser and canvas size.
+   * This can be particularly useful when rendering large canvases on iOS Safari (https://pqina.nl/blog/canvas-area-exceeds-the-maximum-limit/)
+   */
   export let pixelRatio: 'auto' | number | null = null;
   export let contextSettings: CanvasRenderingContext2DSettings | undefined = undefined;
   export let style = '';
+  /**
+   * When useWorker is true, a worker with offscreen canvas will be registered to perform intensive operations without blocking the main thread.
+   * When useWorker is false, all operations will be performed in the main thread on the main canvas.
+   */
   export let useWorker = false;
 
   const geometryManager = new GeometryManager();

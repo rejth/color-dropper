@@ -13,7 +13,7 @@ let frame: number | null = null;
 let needsRedraw = true;
 
 /**
- * Offscreen canvas settings for rendering optimization
+ * Offscreen canvas settings for rendering optimization.
  */
 const settings: CanvasRenderingContext2DSettings = {
   willReadFrequently: true,

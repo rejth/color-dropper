@@ -1,17 +1,26 @@
 import { type HEX, type HitCanvasRenderingContext2D } from '.';
 import { pickColor } from '../lib';
 
+/**
+ * Offscreen canvas settings for rendering optimization
+ */
 const settings: CanvasRenderingContext2DSettings = {
   willReadFrequently: true,
   alpha: false,
 };
 
+/** A list of canvas context setters that we do not need to use on the offscreen canvas, so this allows to optimize rendering */
 const EXCLUDED_SETTERS: Array<keyof HitCanvasRenderingContext2D> = [
   'shadowBlur',
   'globalCompositeOperation',
   'globalAlpha',
 ];
 
+/**
+ * Under the hood, we proxy all CanvasRenderingContext2D methods to a second, offscreen canvas.
+ * When an event occurs on the main canvas, the color of the pixel at the event coordinates is read from the offscreen canvas and converted to HEX color code.
+ * This approach can also be useful for identifying the corresponding layer using a unique fill and stroke color and then re-dispatch an event to the Layer component.
+ */
 export function createHitCanvas(
   canvas: HTMLCanvasElement,
   contextSettings: CanvasRenderingContext2DSettings | undefined,

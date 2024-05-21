@@ -22,7 +22,7 @@ export class GeometryManager {
   getCoordinates(e: OriginalEvent): Point {
     if (window.TouchEvent && e instanceof TouchEvent) {
       return this.getTouchCoordinates(e);
-    } else if (e instanceof MouseEvent || e instanceof PointerEvent) {
+    } else if (e instanceof MouseEvent) {
       return this.getMouseCoordinates(e);
     }
 
@@ -50,7 +50,7 @@ export class GeometryManager {
 
     if (window.TouchEvent && e instanceof TouchEvent) {
       return this.getTouchPosition(e, rect);
-    } else if (e instanceof MouseEvent || e instanceof PointerEvent) {
+    } else if (e instanceof MouseEvent) {
       return this.getMousePosition(e, rect);
     }
 

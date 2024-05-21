@@ -12,6 +12,9 @@ let pixelRatio: number | null = null;
 let frame: number | null = null;
 let needsRedraw = true;
 
+/**
+ * Offscreen canvas settings for rendering optimization
+ */
 const settings: CanvasRenderingContext2DSettings = {
   willReadFrequently: true,
 };
@@ -21,6 +24,9 @@ function startRenderLoop() {
   frame = requestAnimationFrame(() => startRenderLoop());
 }
 
+/**
+ * The main render function which is responsible for drawing, clearing and canvas's transformation matrix adjustment.
+ * */
 function render() {
   if (!context) return;
 
@@ -50,12 +56,13 @@ self.onmessage = function (e: MessageEvent<WorkerEvent>) {
   switch (action) {
     case WorkerActionEnum.INIT:
       offscreenCanvas = e.data.canvas;
+      context = offscreenCanvas.getContext('2d', settings);
+
       drawers = parseDrawers(e.data.drawers);
       width = e.data.width;
       height = e.data.height;
       pixelRatio = e.data.pixelRatio;
 
-      context = offscreenCanvas.getContext('2d', settings);
       startRenderLoop();
 
       break;

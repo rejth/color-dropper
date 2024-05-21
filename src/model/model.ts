@@ -11,7 +11,7 @@ export type LayerId = string;
 export type Point = { x: number; y: number };
 export type RGB = [number, number, number];
 export type HEX = string;
-export type OriginalEvent = MouseEvent | PointerEvent | TouchEvent;
+export type OriginalEvent = MouseEvent | PointerEvent;
 
 export interface Render {
   (props: RenderProps): void;

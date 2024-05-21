@@ -25,6 +25,10 @@ export class RenderWorker {
   cursor: Writable<CursorState> = writable({ x: 0, y: 0, color: BLACK });
 
   constructor(geometryManager: GeometryManager) {
+    /**
+     * Register a worker allowing to perform intensive operations without blocking the main thread.
+     * But data transfering (image data back to the main thread frequently) can introduce overhead and latency due to the serialization and deserialization of data.
+     */
     this.worker = new Worker();
     this.geometryManager = geometryManager;
 
@@ -33,6 +37,10 @@ export class RenderWorker {
     });
   }
 
+  /**
+    * Creates the offscreen canvas, transfer it to a worker and subscribe to the worker events.
+    * Since ownership of the main canvas is transferred, it becomes available only to the worker.
+  */
   init(canvas: HTMLCanvasElement, _contextSettings: CanvasRenderingContext2DSettings | undefined) {
     const offscreenCanvas = canvas.transferControlToOffscreen();
 
@@ -40,7 +48,7 @@ export class RenderWorker {
       {
         action: WorkerActionEnum.INIT,
         canvas: offscreenCanvas,
-        drawers: JSONfn.stringify(Array.from(get(this.drawers))),
+        drawers: this.stringifyDrawers(),
         width: this.width,
         height: this.height,
         pixelRatio: this.pixelRatio,
@@ -48,12 +56,14 @@ export class RenderWorker {
       [offscreenCanvas],
     );
 
-    this.worker.onmessage = (event: MessageEvent<WorkerEvent>) => {
-      if (event.data.action === WorkerActionEnum.GET_COLOR) {
-        const point = event.data.cursorPosition;
-        this.cursor.set({ x: point.x, y: point.y, color: event.data.color });
-      } else if (event.data.action === WorkerActionEnum.PICK_COLOR) {
-        this.selectedColor.set(event.data.color);
+    this.worker.onmessage = (e: MessageEvent<WorkerEvent>) => {
+      const { action, color, cursorPosition } = e.data;
+
+      if (action === WorkerActionEnum.GET_COLOR) {
+        const { x, y } = cursorPosition;
+        this.cursor.set({ x, y, color });
+      } else if (action === WorkerActionEnum.PICK_COLOR) {
+        this.selectedColor.set(color);
       }
     };
   }
@@ -93,15 +103,24 @@ export class RenderWorker {
     });
   }
 
+  /**
+   * Forces canvas's transformation matrix adjustment to scale drawings according to the new width, height or device's pixel ratio.
+   */
   redraw() {
     this.resize();
   }
 
+  /**
+   * Handles "click" event on main canvas and sends the corresponding event to get the underlying pixel data from the offscreen canvas.
+   */
   handlePick(e: OriginalEvent) {
     const { x, y } = this.geometryManager.calculatePosition(e);
     this.worker.postMessage({ action: WorkerActionEnum.PICK_COLOR, x, y, cursorPosition: { x, y } });
   }
 
+  /**
+   * Handles "move" event on the main canvas and sends the corresponding event to get the underlying pixel data from the offscreen canvas.
+   */
   handleMove(e: OriginalEvent) {
     const { x, y } = this.geometryManager.calculatePosition(e);
     const cursorPosition = this.geometryManager.getCoordinates(e);

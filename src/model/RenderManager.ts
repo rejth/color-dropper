@@ -3,6 +3,7 @@ import {
   createHitCanvas,
   GeometryManager,
   type CursorState,
+  type HEX,
   type HitCanvasRenderingContext2D,
   type LayerId,
   type OriginalEvent,
@@ -23,7 +24,7 @@ export class RenderManager {
   needsRedraw: boolean;
   needsCacheImage: boolean;
 
-  selectedColor: Writable<string> = writable(BLACK);
+  selectedColor: Writable<HEX> = writable(BLACK);
   cursor: Writable<CursorState> = writable({ x: 0, y: 0, color: BLACK });
 
   constructor(geometryManager: GeometryManager) {
@@ -54,6 +55,9 @@ export class RenderManager {
     this.drawers.delete(layerId);
   }
 
+  /**
+   * The main render function which is responsible for drawing, clearing and canvas's transformation matrix adjustment.
+   * */
   render() {
     const context = this.context!;
     const width = this.width!;
@@ -77,11 +81,18 @@ export class RenderManager {
     }
   }
 
+  /**
+   * Forces canvas's transformation matrix adjustment to scale drawings according to the new width, height or device's pixel ratio.
+   * Forces caching image data representing the underlying pixel data for the entire canvas.
+   */
   redraw() {
     this.needsRedraw = true;
     this.needsCacheImage = true;
   }
 
+  /**
+   * Handles "click" event on canvas to get the underlying pixel data and convert it to HEX color code.
+   */
   handlePick(e: OriginalEvent) {
     if (!this.imageData) return;
 
@@ -90,6 +101,9 @@ export class RenderManager {
     this.selectedColor.set(hexCode);
   }
 
+  /**
+   * Handles "move" event on canvas to get the underlying pixel data and convert it to HEX color code.
+   */
   handleMove(e: OriginalEvent) {
     if (!this.imageData) return;
 

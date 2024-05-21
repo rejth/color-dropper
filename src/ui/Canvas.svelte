@@ -87,8 +87,8 @@
   bind:this={canvasRef}
   bind:clientWidth={canvasWidth}
   bind:clientHeight={canvasHeight}
-  on:touchstart={onClick}
-  on:touchmove={onMove}
+  on:touchstart|passive={onClick}
+  on:touchmove|passive={onMove}
   on:mousedown={onClick}
   on:mousemove={onMove}
   on:pointerdown={onClick}
@@ -116,7 +116,7 @@
   on:mouseout
   on:mouseup
   on:select
-  on:wheel
+  on:wheel|passive
   on:drag
   on:dragend
   on:dragenter
@@ -126,8 +126,8 @@
   on:drop
   on:touchcancel
   on:touchend
-  on:touchmove
-  on:touchstart
+  on:touchmove|passive
+  on:touchstart|passive
   on:pointerover
   on:pointerenter
   on:pointerdown

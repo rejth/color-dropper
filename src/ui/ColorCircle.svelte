@@ -1,10 +1,11 @@
 <script lang="ts">
   import { getContext } from 'svelte';
-  import { BLACK, KEY, WHITE, type Context } from '../lib';
+  import { type AppContext } from '../model';
+  import { BLACK, KEY, WHITE } from '../lib';
 
   export let isActive: boolean;
 
-  const { renderManager } = getContext<Context>(KEY);
+  const { renderManager } = getContext<AppContext>(KEY);
   const { cursor } = renderManager;
 </script>
 
@@ -55,6 +56,7 @@
     pointer-events: none;
     user-select: none;
     touch-action: none;
+    z-index: 1;
   }
 
   .cursor {

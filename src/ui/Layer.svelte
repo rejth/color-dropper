@@ -1,11 +1,12 @@
 <script lang="ts">
   import { getContext, onMount } from 'svelte';
   import { v4 as uuid } from 'uuid';
-  import { type Render, type Context, KEY } from '../lib';
+  import { type Render, type AppContext } from '../model';
+  import { KEY } from '../lib';
 
   export let render: Render;
 
-  const { renderManager } = getContext<Context>(KEY);
+  const { renderManager } = getContext<AppContext>(KEY);
 
   onMount(() => {
     const layerId = uuid();

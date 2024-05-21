@@ -5,17 +5,19 @@
   import Layer from './Layer.svelte';
   import ColorPicker from './ColorPicker.svelte';
   import ColorCircle from './ColorCircle.svelte';
-  import { RenderManager, type Context, KEY, GeometryManager } from '../lib';
-  import { RenderWorker } from '../lib/RenderWorker';
+  import Spinner from './Spinner.svelte';
+
+  import { RenderManager, RenderWorker, type AppContext, GeometryManager } from '../model';
+  import { KEY } from '../lib';
 
   const renderManager = new RenderManager(new GeometryManager());
   const { selectedColor } = renderManager;
 
-  setContext<Context>(KEY, {
+  setContext<AppContext>(KEY, {
     renderManager,
   });
 
-  let images: CanvasImageSource[] = [];
+  let imageSource: CanvasImageSource | null = null;
   let isEntered = false;
   let needsPickColor = false;
 
@@ -25,7 +27,7 @@
 
     image.onload = async () => {
       const imageBitmap = await createImageBitmap(image);
-      images = [...images, imageBitmap];
+      imageSource = imageBitmap;
     };
   });
 
@@ -51,33 +53,40 @@
     </span>
     <strong class="selected-color">{$selectedColor}</strong>
   </div>
-  <Canvas
-    isActive={needsPickColor}
-    on:mouseenter={onEnter}
-    on:mouseleave={onLeave}
-    on:pointerenter={onEnter}
-    on:pointerleave={onLeave}
-  >
-    {#each images as image}
+  {#if !imageSource}
+    <div class="spinner">
+      <Spinner />
+    </div>
+  {:else}
+    <ColorCircle isActive={isEntered && needsPickColor} />
+    <Canvas
+      isActive={needsPickColor}
+      on:mouseenter={onEnter}
+      on:mouseleave={onLeave}
+      on:pointerenter={onEnter}
+      on:pointerleave={onLeave}
+    >
       <Layer
         render={({ ctx, width, height }) => {
-          const bounds = { x0: 160, y0: 160, x1: 480, y1: 480 };
-          let { x0, y0, x1, y1 } = bounds;
-          ctx.globalAlpha = 0.9;
-          ctx.fillStyle = 'tomato';
-          ctx.fillRect(x0, y0, x1 - x0, y1 - y0);
-          ctx.globalAlpha = 1;
+          if (!imageSource) return;
+          ctx.drawImage(imageSource, 0, 0, width, height);
         }}
       />
-    {/each}
-  </Canvas>
-  <ColorCircle isActive={isEntered && needsPickColor} />
+    </Canvas>
+  {/if}
 </div>
 
 <style>
   .color-dropper {
     width: 100%;
     height: calc(100vh - 2em);
+  }
+
+  .spinner {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: center;
   }
 
   .toolbar {

@@ -1,12 +1,7 @@
 <script lang="ts">
   import { createEventDispatcher, getContext, onMount } from 'svelte';
-  import {
-    type OriginalEvent,
-    type Context,
-    type ResizeEvent,
-    getMaxPixelRatio,
-    KEY,
-  } from '../lib';
+  import { type OriginalEvent, type AppContext, type ResizeEvent } from '../model';
+  import { getMaxPixelRatio, KEY } from '../lib';
 
   export let width: number | null = null;
   export let height: number | null = null;
@@ -17,7 +12,7 @@
 
   export const getCanvasElement = (): HTMLCanvasElement => canvasRef;
 
-  const { renderManager } = getContext<Context>(KEY);
+  const { renderManager } = getContext<AppContext>(KEY);
   const { geometryManager } = renderManager;
 
   const dispatch = createEventDispatcher<ResizeEvent>();

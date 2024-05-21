@@ -1,15 +1,15 @@
 import { get, writable, type Writable } from 'svelte/store';
 import JSONfn from 'json-fn';
 import {
-  BLACK,
   GeometryManager,
   WorkerActionEnum,
   type CursorState,
   type LayerId,
   type OriginalEvent,
   type Render,
-  type WorkerEvent,
+  type WorkerEvent
 } from '.';
+import { BLACK } from '../lib';
 import Worker from './worker?worker';
 
 export class RenderWorker {

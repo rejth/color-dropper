@@ -1,7 +1,9 @@
-import { rgbToHex, type HEX, type HitCanvasRenderingContext2D } from '.';
+import { type HEX, type HitCanvasRenderingContext2D } from '.';
+import { pickColor } from '../lib';
 
-const offscreeSettings: CanvasRenderingContext2DSettings = {
+const settings: CanvasRenderingContext2DSettings = {
   willReadFrequently: true,
+  alpha: false,
 };
 
 const EXCLUDED_SETTERS: Array<keyof HitCanvasRenderingContext2D> = [
@@ -16,10 +18,7 @@ export function createHitCanvas(
 ): HitCanvasRenderingContext2D {
   const context = canvas.getContext('2d', contextSettings);
   const hitCanvas = new OffscreenCanvas(canvas.width, canvas.height);
-  const hitContext = hitCanvas.getContext(
-    '2d',
-    offscreeSettings,
-  ) as unknown as HitCanvasRenderingContext2D;
+  const hitContext = hitCanvas.getContext('2d', settings) as unknown as HitCanvasRenderingContext2D;
 
   const hitCanvasObserver = new MutationObserver(() => {
     hitCanvas.width = canvas.width;
@@ -28,20 +27,23 @@ export function createHitCanvas(
 
   hitCanvasObserver.observe(canvas, { attributeFilter: ['width', 'height'] });
 
-  const pickColor = (x: number, y: number, imageData: Uint8ClampedArray): HEX => {
-    // If we do not have cached image data, we use offscreen canvas context to get underlying pixel data
-    if (!imageData) {
-      return rgbToHex(hitContext.getImageData(x, y, 1, 1).data);
-    }
-    // Calculate the index of the underlying pixel in the imageData array
-    const index = (Math.floor(y) * hitCanvas.width + Math.floor(x)) * 4;
-    return rgbToHex([imageData[index], imageData[index + 1], imageData[index + 2]]);
+  const getColor = (x: number, y: number, imageData: Uint8ClampedArray): HEX => {
+    return pickColor(hitCanvas, hitContext, x, y, imageData)
   };
+
+  const getImageData = (sx: number, sy: number, sw: number, sh: number, settings?: ImageDataSettings | undefined): ImageData => {
+    return hitContext.getImageData(sx, sy, sw, sh, settings)
+  };
+
 
   return new Proxy(context as unknown as HitCanvasRenderingContext2D, {
     get(targetContext, property: keyof HitCanvasRenderingContext2D) {
       if (property === 'pickColor') {
-        return pickColor;
+        return getColor;
+      }
+
+      if (property === 'getImageData') {
+        return getImageData;
       }
 
       const value = targetContext[property];

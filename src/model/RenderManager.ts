@@ -1,14 +1,13 @@
 import { writable, type Writable } from 'svelte/store';
 import {
-  BLACK,
   createHitCanvas,
   GeometryManager,
   type CursorState,
   type HitCanvasRenderingContext2D,
   type LayerId,
   type OriginalEvent,
-  type Render,
-} from '.';
+  type Render } from '.'
+import { BLACK } from '../lib';
 
 export class RenderManager {
   width?: number;

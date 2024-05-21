@@ -1,4 +1,4 @@
-import type { OriginalEvent, Point } from './types';
+import type { OriginalEvent, Point } from '.';
 
 export class GeometryManager {
   pixelRatio: number = 2;

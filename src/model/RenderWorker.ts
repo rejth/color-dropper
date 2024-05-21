@@ -28,8 +28,8 @@ export class RenderWorker {
     this.worker = new Worker();
     this.geometryManager = geometryManager;
 
-    this.drawers.subscribe((value) => {
-      this.update(value);
+    this.drawers.subscribe(() => {
+      this.update();
     });
   }
 
@@ -58,20 +58,24 @@ export class RenderWorker {
     };
   }
 
+  stringifyDrawers() {
+    return JSONfn.stringify(Array.from(get(this.drawers)))
+  }
+
   resize() {
     this.worker.postMessage({
       action: WorkerActionEnum.RESIZE,
-      drawers: JSONfn.stringify(Array.from(get(this.drawers))),
+      drawers: this.stringifyDrawers(),
       width: this.width,
       height: this.height,
       pixelRatio: this.pixelRatio,
     });
   }
 
-  update(drawers: Map<LayerId, Render>) {
+  update() {
     this.worker.postMessage({
       action: WorkerActionEnum.UPDATE,
-      drawers: JSONfn.stringify(Array.from(drawers)),
+      drawers: this.stringifyDrawers(),
       width: this.width,
       height: this.height,
       pixelRatio: this.pixelRatio,

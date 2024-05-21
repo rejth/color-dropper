@@ -1,35 +1,32 @@
 <script lang="ts">
-  import { onMount, setContext } from 'svelte';
+  import { setContext } from 'svelte';
 
   import Canvas from './Canvas.svelte';
-  import Layer from './Layer.svelte';
   import ColorPicker from './ColorPicker.svelte';
   import ColorCircle from './ColorCircle.svelte';
-  import Spinner from './Spinner.svelte';
 
   import { RenderManager, RenderWorker, type AppContext, GeometryManager } from '../model';
   import { KEY } from '../lib';
 
-  const renderManager = new RenderManager(new GeometryManager());
-  const { selectedColor } = renderManager;
+  export let width: number | null = null;
+  export let height: number | null = null;
+  export let pixelRatio: 'auto' | number | null = null;
+  export let contextSettings: CanvasRenderingContext2DSettings | undefined = undefined;
+  export let style = '';
+  export let useWorker = false;
+
+  const geometryManager = new GeometryManager();
+  const renderManager = useWorker
+    ? new RenderWorker(geometryManager)
+    : new RenderManager(geometryManager);
 
   setContext<AppContext>(KEY, {
     renderManager,
   });
 
-  let imageSource: CanvasImageSource | null = null;
+  const { selectedColor } = renderManager;
   let isEntered = false;
   let needsPickColor = false;
-
-  onMount(async () => {
-    const image = new Image();
-    image.src = 'images/texture.jpg';
-
-    image.onload = async () => {
-      const imageBitmap = await createImageBitmap(image);
-      imageSource = imageBitmap;
-    };
-  });
 
   const onEnter = () => {
     isEntered = true;
@@ -53,40 +50,27 @@
     </span>
     <strong class="selected-color">{$selectedColor}</strong>
   </div>
-  {#if !imageSource}
-    <div class="spinner">
-      <Spinner />
-    </div>
-  {:else}
-    <ColorCircle isActive={isEntered && needsPickColor} />
-    <Canvas
-      isActive={needsPickColor}
-      on:mouseenter={onEnter}
-      on:mouseleave={onLeave}
-      on:pointerenter={onEnter}
-      on:pointerleave={onLeave}
-    >
-      <Layer
-        render={({ ctx, width, height }) => {
-          if (!imageSource) return;
-          ctx.drawImage(imageSource, 0, 0, width, height);
-        }}
-      />
-    </Canvas>
-  {/if}
+  <ColorCircle isActive={isEntered && needsPickColor} />
+  <Canvas
+    {style}
+    {width}
+    {height}
+    {pixelRatio}
+    {contextSettings}
+    isActive={needsPickColor}
+    on:mouseenter={onEnter}
+    on:mouseleave={onLeave}
+    on:pointerenter={onEnter}
+    on:pointerleave={onLeave}
+  >
+    <slot />
+  </Canvas>
 </div>
 
 <style>
   .color-dropper {
     width: 100%;
     height: calc(100vh - 2em);
-  }
-
-  .spinner {
-    display: flex;
-    flex-direction: row;
-    align-items: center;
-    justify-content: center;
   }
 
   .toolbar {

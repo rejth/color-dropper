@@ -14,15 +14,14 @@ let needsRedraw = true;
 
 const settings: CanvasRenderingContext2DSettings = {
   willReadFrequently: true,
-  alpha: false,
 };
 
-const startRenderLoop = () => {
+function startRenderLoop() {
   render();
   frame = requestAnimationFrame(() => startRenderLoop());
-};
+}
 
-const render = () => {
+function render() {
   if (!context) return;
 
   width = width!;
@@ -39,7 +38,11 @@ const render = () => {
   drawers.forEach((draw) => {
     draw({ ctx: context!, width: width!, height: height! });
   });
-};
+}
+
+function parseDrawers(drawers: string): Map<LayerId, Render> {
+  return new Map(JSONfn.parse(drawers));
+}
 
 self.onmessage = function (e: MessageEvent<WorkerEvent>) {
   const { action } = e.data;
@@ -47,31 +50,31 @@ self.onmessage = function (e: MessageEvent<WorkerEvent>) {
   switch (action) {
     case WorkerActionEnum.INIT:
       offscreenCanvas = e.data.canvas;
-      drawers = new Map(JSONfn.parse(e.data.drawers));
+      drawers = parseDrawers(e.data.drawers);
       width = e.data.width;
       height = e.data.height;
       pixelRatio = e.data.pixelRatio;
 
-      context = offscreenCanvas!.getContext('2d', settings);
+      context = offscreenCanvas.getContext('2d', settings);
       startRenderLoop();
+
       break;
     case WorkerActionEnum.RESIZE:
       if (!e.data.width || !e.data.height) break;
-
-      drawers = new Map(JSONfn.parse(e.data.drawers));
+      drawers = parseDrawers(e.data.drawers);
       width = e.data.width;
       height = e.data.height;
       pixelRatio = e.data.pixelRatio;
 
       if (offscreenCanvas) {
-        offscreenCanvas.width = width!;
-        offscreenCanvas.height = height!;
+        offscreenCanvas.width = width * pixelRatio;
+        offscreenCanvas.height = height * pixelRatio;
       }
 
       needsRedraw = true;
       break;
     case WorkerActionEnum.UPDATE:
-      drawers = new Map(JSONfn.parse(e.data.drawers));
+      drawers = parseDrawers(e.data.drawers);
       break;
     case WorkerActionEnum.GET_COLOR:
       self.postMessage({

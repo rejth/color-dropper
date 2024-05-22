@@ -9,7 +9,7 @@
 
 ## Notes
 
-`ColorDropper` with `useProxyCanvas` property and cached canvas image data consumes less CPU resources than without them.
+The `ColorDropper` component with the `useProxyCanvas` property and cached canvas image data consumes less CPU resources than without them.
 
 ## Current technical issues
 

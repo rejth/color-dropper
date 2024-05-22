@@ -34,16 +34,19 @@ function render() {
   height = height!;
   pixelRatio = pixelRatio!;
 
+  /**
+  * Render canvas when width, height or pixelRatio change.
+  */
   if (needsRedraw) {
     context.setTransform(pixelRatio, 0, 0, pixelRatio, 0, 0);
+    context.clearRect(0, 0, width, height);
+
+    drawers.forEach((draw) => {
+      draw({ ctx: context!, width: width!, height: height! });
+    });
+
     needsRedraw = false;
   }
-
-  context.clearRect(0, 0, width, height);
-
-  drawers.forEach((draw) => {
-    draw({ ctx: context!, width: width!, height: height! });
-  });
 }
 
 function parseDrawers(drawers: string): Map<LayerId, Render> {

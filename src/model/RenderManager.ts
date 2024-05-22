@@ -81,21 +81,27 @@ export class RenderManager {
     const height = this.height!;
     const pixelRatio = this.pixelRatio!;
 
-    if (this.needsRedraw) {
-      context.setTransform(pixelRatio, 0, 0, pixelRatio, 0, 0);
-      this.needsRedraw = false;
-    }
+    /**
+     * Render canvas when width, height or pixelRatio change.
+     */
+    if (!this.needsRedraw) return;
 
+    context.setTransform(pixelRatio, 0, 0, pixelRatio, 0, 0);
     context.clearRect(0, 0, width, height);
 
     this.drawers.forEach((draw) => {
       draw({ ctx: context, width, height });
     });
 
+    /**
+     * Cache canvas image data to avoid heavy frequent read-back operations via getImageData().
+    */
     if (this.needsCacheImage && width > 0 && height > 0) {
       this.imageData = context.getImageData(0, 0, width * pixelRatio, height * pixelRatio);
       this.needsCacheImage = false;
     }
+
+    this.needsRedraw = false;
   }
 
   /**

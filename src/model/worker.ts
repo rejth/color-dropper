@@ -1,5 +1,5 @@
 import JSONfn from 'json-fn';
-import { WorkerActionEnum, type LayerId, type Render, type WorkerEvent } from '.'
+import { WorkerActionEnum, type LayerId, type Render, type WorkerEvent } from '.';
 import { pickColor } from '../lib';
 
 let offscreenCanvas: OffscreenCanvas | null = null;

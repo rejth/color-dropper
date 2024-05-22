@@ -7,7 +7,7 @@ import {
   type LayerId,
   type OriginalEvent,
   type Render,
-  type WorkerEvent
+  type WorkerEvent,
 } from '.';
 import { BLACK } from '../lib';
 import Worker from './worker?worker';
@@ -40,9 +40,9 @@ export class RenderWorker {
   }
 
   /**
-    * Creates the offscreen canvas, transfer it to a worker and subscribe to the worker events.
-    * Since ownership of the main canvas is transferred, it becomes available only to the worker.
-  */
+   * Creates the offscreen canvas, transfer it to a worker and subscribe to the worker events.
+   * Since ownership of the main canvas is transferred, it becomes available only to the worker.
+   */
   init(canvas: HTMLCanvasElement, _contextSettings: CanvasRenderingContext2DSettings | undefined) {
     this.canvas = canvas;
     const offscreenCanvas = canvas.transferControlToOffscreen();
@@ -72,7 +72,7 @@ export class RenderWorker {
   }
 
   stringifyDrawers() {
-    return JSONfn.stringify(Array.from(get(this.drawers)))
+    return JSONfn.stringify(Array.from(get(this.drawers)));
   }
 
   resize() {
@@ -118,7 +118,12 @@ export class RenderWorker {
    */
   handlePick(e: OriginalEvent) {
     const { x, y } = this.geometryManager.calculatePosition(e);
-    this.worker.postMessage({ action: WorkerActionEnum.PICK_COLOR, x, y, cursorPosition: { x, y } });
+    this.worker.postMessage({
+      action: WorkerActionEnum.PICK_COLOR,
+      x,
+      y,
+      cursorPosition: { x, y },
+    });
   }
 
   /**

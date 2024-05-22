@@ -38,13 +38,18 @@ export function createHitCanvas(
   hitCanvasObserver.observe(canvas, { attributeFilter: ['width', 'height'] });
 
   const getColor = (x: number, y: number, imageData: Uint8ClampedArray): HEX => {
-    return pickColor(hitCanvas, hitContext, x, y, imageData)
+    return pickColor(hitCanvas, hitContext, x, y, imageData);
   };
 
-  const getImageData = (sx: number, sy: number, sw: number, sh: number, settings?: ImageDataSettings | undefined): ImageData => {
-    return hitContext.getImageData(sx, sy, sw, sh, settings)
+  const getImageData = (
+    sx: number,
+    sy: number,
+    sw: number,
+    sh: number,
+    settings?: ImageDataSettings | undefined,
+  ): ImageData => {
+    return hitContext.getImageData(sx, sy, sw, sh, settings);
   };
-
 
   return new Proxy(context as unknown as HitCanvasRenderingContext2D, {
     get(targetContext, property: keyof HitCanvasRenderingContext2D) {

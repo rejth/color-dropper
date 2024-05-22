@@ -4,4 +4,4 @@ import Spinner from './Spinner.svelte';
 
 export { ColorDropper };
 export { Layer };
-export { Spinner }
+export { Spinner };

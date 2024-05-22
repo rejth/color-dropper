@@ -5,8 +5,11 @@ export type AppContext = {
   renderManager: RenderManager | RenderWorker;
 };
 
-export type CanvasType = HTMLCanvasElement | OffscreenCanvas
-export type CanvasContextType = CanvasRenderingContext2D | OffscreenCanvasRenderingContext2D | HitCanvasRenderingContext2D
+export type CanvasType = HTMLCanvasElement | OffscreenCanvas;
+export type CanvasContextType =
+  | CanvasRenderingContext2D
+  | OffscreenCanvasRenderingContext2D
+  | HitCanvasRenderingContext2D;
 export type LayerId = string;
 export type Point = { x: number; y: number };
 export type RGB = [number, number, number];
@@ -41,7 +44,7 @@ export type ResizeEvent = {
   };
 };
 
-export type WorkerAction = 'init' | 'resize' | 'update' | 'getColor' | 'pickColor'
+export type WorkerAction = 'init' | 'resize' | 'update' | 'getColor' | 'pickColor';
 
 export enum WorkerActionEnum {
   INIT = 'init',
@@ -52,14 +55,14 @@ export enum WorkerActionEnum {
 }
 
 export type WorkerEvent = {
-  action: WorkerAction,
-  canvas: OffscreenCanvas,
-  drawers: string,
-  x: number,
-  y: number,
-  width: number,
-  height: number,
-  pixelRatio: number,
-  cursorPosition: Point,
-  color: HEX,
-}
+  action: WorkerAction;
+  canvas: OffscreenCanvas;
+  drawers: string;
+  x: number;
+  y: number;
+  width: number;
+  height: number;
+  pixelRatio: number;
+  cursorPosition: Point;
+  color: HEX;
+};

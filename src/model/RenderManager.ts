@@ -7,7 +7,8 @@ import {
   type HitCanvasRenderingContext2D,
   type LayerId,
   type OriginalEvent,
-  type Render } from '.'
+  type Render,
+} from '.';
 import { BLACK, pickColor } from '../lib';
 
 export class RenderManager {
@@ -41,7 +42,11 @@ export class RenderManager {
     this.render = this.render.bind(this);
   }
 
-  init(canvas: HTMLCanvasElement, useProxyCanvas: boolean, contextSettings: CanvasRenderingContext2DSettings | undefined) {
+  init(
+    canvas: HTMLCanvasElement,
+    useProxyCanvas: boolean,
+    contextSettings: CanvasRenderingContext2DSettings | undefined,
+  ) {
     this.canvas = canvas;
     this.useProxyCanvas = useProxyCanvas;
 
@@ -108,9 +113,8 @@ export class RenderManager {
     if (this.useProxyCanvas) {
       return (<HitCanvasRenderingContext2D>this.context).pickColor(x, y, imageData);
     } else {
-      return pickColor(this.canvas!, this.context!, x, y, imageData)
+      return pickColor(this.canvas!, this.context!, x, y, imageData);
     }
-
   }
 
   /**

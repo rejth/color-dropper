@@ -2,6 +2,10 @@
   import { onMount } from 'svelte';
   import { ColorDropper, Layer, Spinner } from './ui';
 
+  const settings: CanvasRenderingContext2DSettings = {
+    willReadFrequently: true,
+  };
+
   let imageSource: CanvasImageSource | null = null;
 
   onMount(async () => {
@@ -26,7 +30,7 @@
       <Spinner />
     </div>
   {:else}
-    <ColorDropper useWorker={false}>
+    <ColorDropper useProxyCanvas>
       <Layer
         render={({ ctx, width, height }) => {
           if (!imageSource) return;

@@ -1,47 +1,105 @@
-# Svelte + TS + Vite
+# Color Dropper
 
-This template should help get you started developing with Svelte and TypeScript in Vite.
+[Demo](https://color-dropper-ivory.vercel.app/)
 
 ## Recommended IDE Setup
 
 [VS Code](https://code.visualstudio.com/) + [Svelte](https://marketplace.visualstudio.com/items?itemName=svelte.svelte-vscode).
 
-## Need an official Svelte framework?
+## Notes
 
-Check out [SvelteKit](https://github.com/sveltejs/kit#readme), which is also powered by Vite. Deploy anywhere with its serverless-first approach and adapt to various platforms, with out of the box support for TypeScript, SCSS, and Less, and easily-added support for mdsvex, GraphQL, PostCSS, Tailwind CSS, and more.
+`ColorDropper` with `useProxyCanvas` property and cached canvas image data consumes less CPU resources than without them.
 
-## Technical considerations
+## Current technical issues
 
-**Why use this over SvelteKit?**
+The `ColorDropper` component does not work properly with Workers right now because of a function serialization problem. \
+When we register a new worker via the `useWorker` property, we need to serialize and deserialize data for transferring between threads (image data back to the main thread frequently).  \
+This is where the problem with `render` functions and their closures comes up. Serialization works correctly only for functions without closures.
 
-- It brings its own routing solution which might not be preferable for some users.
-- It is first and foremost a framework that just happens to use Vite under the hood, not a Vite app.
+For example, this works correctly, because the `render` function does not have a closure with external variables:
 
-This template contains as little as possible to get started with Vite + TypeScript + Svelte, while taking into account the developer experience with regards to HMR and intellisense. It demonstrates capabilities on par with the other `create-vite` templates and is a good starting point for beginners dipping their toes into a Vite + Svelte project.
+```svelte
+...
+<ColorDropper useWorker>
+  <Layer
+    render={({ ctx }) => {
+      const bounds = { x0: 160, y0: 160, x1: 480, y1: 480 };
+      let { x0, y0, x1, y1 } = bounds;
+      ctx.globalAlpha = 0.9;
+      ctx.fillStyle = 'tomato';
+      ctx.fillRect(x0, y0, x1 - x0, y1 - y0);
+      ctx.globalAlpha = 1;
+    }}
+  />
+</ColorDropper>
+...
+```
 
-Should you later need the extended capabilities and extensibility provided by SvelteKit, the template has been structured similarly to SvelteKit so that it is easy to migrate.
+But this does not work, because the `render` function has an `imageSource` variable in the closure:
 
-**Why `global.d.ts` instead of `compilerOptions.types` inside `jsconfig.json` or `tsconfig.json`?**
+```svelte
+...
+<ColorDropper useWorker>
+  <Layer
+    render={({ ctx }) => {
+      if (!imageSource) return;
+      ctx.drawImage(imageSource, 0, 0, width, height);
+    }}
+  />
+</ColorDropper>
+...
+```
 
-Setting `compilerOptions.types` shuts out all other types not explicitly listed in the configuration. Using triple-slash references keeps the default TypeScript setting of accepting type information from the entire workspace, while also adding `svelte` and `vite/client` type information.
+## Examples
 
-**Why include `.vscode/extensions.json`?**
+```svelte
+...
+<ColorDropper useProxyCanvas>
+  <Layer
+    render={({ ctx, width, height }) => {
+      if (!imageSource) return;
+      ctx.drawImage(imageSource, 0, 0, width, height);
+    }}
+  />
+</ColorDropper>
+...
+```
 
-Other templates indirectly recommend extensions via the README, but this file allows VS Code to prompt the user to install the recommended extension upon opening the project.
+```svelte
+...
+const colors = ['tomato', 'goldenrod', 'mediumturquoise'];
 
-**Why enable `allowJs` in the TS template?**
+<ColorDropper useProxyCanvas>
+  {#each colors as color, i (color)}
+    {@const c = (i + 1) * 85}
+    <Layer
+      render={({ ctx }) => {
+        const bounds = { x0: c, y0: c, x1: c + 338, y1: c + 338 };
+        const { x0, y0, x1, y1 } = bounds;
+        ctx.globalAlpha = 0.9;
+        ctx.fillStyle = color;
+        ctx.fillRect(x0, y0, x1 - x0, y1 - y0);
+        ctx.globalAlpha = 1;
+      }}
+    />
+  {/each}
+</ColorDropper>
+...
+```
 
-While `allowJs: false` would indeed prevent the use of `.js` files in the project, it does not prevent the use of JavaScript syntax in `.svelte` files. In addition, it would force `checkJs: false`, bringing the worst of both worlds: not being able to guarantee the entire codebase is TypeScript, and also having worse typechecking for the existing JavaScript. In addition, there are valid use cases in which a mixed codebase may be relevant.
-
-**Why is HMR not preserving my local component state?**
-
-HMR state preservation comes with a number of gotchas! It has been disabled by default in both `svelte-hmr` and `@sveltejs/vite-plugin-svelte` due to its often surprising behavior. You can read the details [here](https://github.com/rixo/svelte-hmr#svelte-hmr).
-
-If you have state that's important to retain within a component, consider creating an external store which would not be replaced by HMR.
-
-```ts
-// store.ts
-// An extremely simple external store
-import { writable } from 'svelte/store';
-export default writable(0);
+```svelte
+...
+<ColorDropper useWorker>
+  <Layer
+    render={({ ctx }) => {
+      const bounds = { x0: 160, y0: 160, x1: 480, y1: 480 };
+      let { x0, y0, x1, y1 } = bounds;
+      ctx.globalAlpha = 0.9;
+      ctx.fillStyle = 'tomato';
+      ctx.fillRect(x0, y0, x1 - x0, y1 - y0);
+      ctx.globalAlpha = 1;
+    }}
+  />
+</ColorDropper>
+...
 ```

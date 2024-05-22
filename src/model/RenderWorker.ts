@@ -17,6 +17,7 @@ export class RenderWorker {
   height?: number;
   pixelRatio?: number;
 
+  canvas: HTMLCanvasElement | null;
   worker: Worker;
   geometryManager: GeometryManager;
 
@@ -31,6 +32,7 @@ export class RenderWorker {
      */
     this.worker = new Worker();
     this.geometryManager = geometryManager;
+    this.canvas = null;
 
     this.drawers.subscribe(() => {
       this.update();
@@ -42,6 +44,7 @@ export class RenderWorker {
     * Since ownership of the main canvas is transferred, it becomes available only to the worker.
   */
   init(canvas: HTMLCanvasElement, _contextSettings: CanvasRenderingContext2DSettings | undefined) {
+    this.canvas = canvas;
     const offscreenCanvas = canvas.transferControlToOffscreen();
 
     this.worker.postMessage(

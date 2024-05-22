@@ -17,6 +17,15 @@
    * This can be particularly useful when rendering large canvases on iOS Safari (https://pqina.nl/blog/canvas-area-exceeds-the-maximum-limit/)
    */
   export let pixelRatio: 'auto' | number | null = null;
+  /**
+   * When useProxyCanvas is true, we will proxy all CanvasRenderingContext2D methods to a second, offscreen canvas (in the main thread).
+   * This has a performance cost (rendering twice in the main thread), so it’s disabled by default.
+   * A proxy offscreen canvas, for example, can be useful for identifying the corresponding layer using a unique fill and stroke color and then re-dispatch an event to the Layer component.
+   *
+   * When useProxyCanvas is false, all operations will be performed on the main canvas.
+   * Consider using "willReadFrequently: true" setting in the contextSettings property if you are going to use frequent read-back operations via getImageData().
+   */
+  export let useProxyCanvas = false;
   export let contextSettings: CanvasRenderingContext2DSettings | undefined = undefined;
   export let isActive = true;
   export let style = '';
@@ -38,7 +47,7 @@
   let maxPixelRatio: number | undefined;
 
   onMount(() => {
-    renderManager.init(canvasRef, contextSettings);
+    renderManager.init(canvasRef, useProxyCanvas, contextSettings);
     return () => renderManager.destroy();
   });
 
@@ -91,6 +100,7 @@
   /**
    * Update app state each time _width, _height or _pixelRatio values of the canvas change
    */
+  $: renderManager.canvas = canvasRef;
   $: renderManager.width = _width;
   $: renderManager.height = _height;
   $: renderManager.pixelRatio = _pixelRatio;

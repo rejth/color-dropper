@@ -18,7 +18,7 @@
   export let height: number | null = null;
   /**
    * If pixelRatio is unset, the canvas uses devicePixelRatio binding to match the window’s pixel dens.
-   * If pixelRatio is set to "auto", the canvas-size library is used to automatically calculate the maximum supported pixel ratio based on the browser and canvas size.
+   * If pixelRatio is set to "auto", we will utomatically calculate the maximum supported pixel ratio based on the browser and canvas size.
    * This can be particularly useful when rendering large canvases on iOS Safari (https://pqina.nl/blog/canvas-area-exceeds-the-maximum-limit/)
    */
   export let pixelRatio: 'auto' | number | null = null;
@@ -26,9 +26,19 @@
   export let style = '';
   /**
    * When useWorker is true, a worker with offscreen canvas will be registered to perform intensive operations without blocking the main thread.
-   * When useWorker is false, all operations will be performed in the main thread on the main canvas.
+   * When useWorker is false, all operations will be performed in the main thread.
+   * If you specify the useWorker property, you do not need to specify the useProxyCanvas property below as the useWorker property forces using offscreen canvas by default.
    */
   export let useWorker = false;
+  /**
+   * When useProxyCanvas is true, we will proxy all CanvasRenderingContext2D methods to a second, offscreen canvas (in the main thread).
+   * This has a performance cost (rendering twice in the main thread), so it’s disabled by default.
+   * A proxy offscreen canvas, for example, can be useful for identifying the corresponding layer using a unique fill and stroke color and then re-dispatch an event to the Layer component.
+   *
+   * When useProxyCanvas is false, all operations will be performed on the main canvas.
+   * Consider using "willReadFrequently: true" setting in the contextSettings property if you are going to use frequent read-back operations via getImageData().
+   */
+  export let useProxyCanvas = false;
 
   const geometryManager = new GeometryManager();
   const renderManager = useWorker
@@ -72,6 +82,7 @@
     {height}
     {pixelRatio}
     {contextSettings}
+    {useProxyCanvas}
     isActive={needsPickColor}
     on:mouseenter={onEnter}
     on:mouseleave={onLeave}

@@ -8,7 +8,7 @@ import {
   type LayerId,
   type OriginalEvent,
   type Render } from '.'
-import { BLACK } from '../lib';
+import { BLACK, pickColor } from '../lib';
 
 export class RenderManager {
   width?: number;
@@ -16,29 +16,41 @@ export class RenderManager {
   pixelRatio?: number;
   frame?: number;
 
-  context: HitCanvasRenderingContext2D | null;
+  canvas: HTMLCanvasElement | null;
+  context: CanvasRenderingContext2D | HitCanvasRenderingContext2D | null;
   geometryManager: GeometryManager;
 
   imageData: ImageData | null;
   drawers: Map<LayerId, Render>;
   needsRedraw: boolean;
   needsCacheImage: boolean;
+  useProxyCanvas: boolean;
 
   selectedColor: Writable<HEX> = writable(BLACK);
   cursor: Writable<CursorState> = writable({ x: 0, y: 0, color: BLACK });
 
   constructor(geometryManager: GeometryManager) {
+    this.canvas = null;
     this.context = null;
     this.imageData = null;
     this.drawers = new Map();
     this.needsRedraw = true;
     this.needsCacheImage = true;
+    this.useProxyCanvas = false;
     this.geometryManager = geometryManager;
     this.render = this.render.bind(this);
   }
 
-  init(canvas: HTMLCanvasElement, contextSettings: CanvasRenderingContext2DSettings | undefined) {
-    this.context = createHitCanvas(canvas, contextSettings);
+  init(canvas: HTMLCanvasElement, useProxyCanvas: boolean, contextSettings: CanvasRenderingContext2DSettings | undefined) {
+    this.canvas = canvas;
+    this.useProxyCanvas = useProxyCanvas;
+
+    if (useProxyCanvas) {
+      this.context = createHitCanvas(canvas, contextSettings);
+    } else {
+      this.context = canvas.getContext('2d', contextSettings);
+    }
+
     this.startRenderLoop();
   }
 
@@ -90,6 +102,17 @@ export class RenderManager {
     this.needsCacheImage = true;
   }
 
+  pickColor(x: number, y: number): HEX {
+    const imageData = this.imageData!.data;
+
+    if (this.useProxyCanvas) {
+      return (<HitCanvasRenderingContext2D>this.context).pickColor(x, y, imageData);
+    } else {
+      return pickColor(this.canvas!, this.context!, x, y, imageData)
+    }
+
+  }
+
   /**
    * Handles "click" event on canvas to get the underlying pixel data and convert it to HEX color code.
    */
@@ -97,7 +120,7 @@ export class RenderManager {
     if (!this.imageData) return;
 
     const { x, y } = this.geometryManager.calculatePosition(e);
-    const hexCode = this.context!.pickColor(x, y, this.imageData.data);
+    const hexCode = this.pickColor(x, y);
     this.selectedColor.set(hexCode);
   }
 
@@ -108,7 +131,7 @@ export class RenderManager {
     if (!this.imageData) return;
 
     const { x, y } = this.geometryManager.calculatePosition(e);
-    const hexCode = this.context!.pickColor(x, y, this.imageData.data);
+    const hexCode = this.pickColor(x, y);
 
     const cursorPosition = this.geometryManager.getCoordinates(e);
     this.cursor.set({ x: cursorPosition.x, y: cursorPosition.y, color: hexCode });

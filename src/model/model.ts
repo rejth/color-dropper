@@ -18,7 +18,7 @@ export interface Render {
 }
 
 export type RenderProps = {
-  ctx: HitCanvasRenderingContext2D | OffscreenCanvasRenderingContext2D;
+  ctx: CanvasContextType;
   width: number;
   height: number;
 };

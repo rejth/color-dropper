@@ -67,7 +67,8 @@ But this does not work, because the `render` function has an `imageSource` varia
 ```
 
 ```svelte
-... const colors = ['tomato', 'goldenrod', 'mediumturquoise'];
+...
+const colors = ['tomato', 'goldenrod', 'mediumturquoise'];
 
 <ColorDropper useProxyCanvas>
   {#each colors as color, i (color)}

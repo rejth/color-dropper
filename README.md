@@ -7,10 +7,6 @@
 
 [VS Code](https://code.visualstudio.com/) + [Svelte](https://marketplace.visualstudio.com/items?itemName=svelte.svelte-vscode).
 
-## Notes
-
-The `ColorDropper` component with the `useProxyCanvas` property and cached canvas image data consumes less CPU resources than without them.
-
 ## Current technical issues
 
 The `ColorDropper` component does not work properly with Workers right now because of a function serialization problem. \
@@ -20,7 +16,6 @@ This is where the problem with `render` functions and their closures comes up. S
 For example, this works correctly, because the `render` function does not have a closure with external variables:
 
 ```svelte
-...
 <ColorDropper useWorker>
   <Layer
     render={({ ctx }) => {
@@ -33,13 +28,11 @@ For example, this works correctly, because the `render` function does not have a
     }}
   />
 </ColorDropper>
-...
 ```
 
 But this does not work, because the `render` function has an `imageSource` variable in the closure:
 
 ```svelte
-...
 <ColorDropper useWorker>
   <Layer
     render={({ ctx }) => {
@@ -48,13 +41,11 @@ But this does not work, because the `render` function has an `imageSource` varia
     }}
   />
 </ColorDropper>
-...
 ```
 
 ## Examples
 
 ```svelte
-...
 <ColorDropper useProxyCanvas>
   <Layer
     render={({ ctx, width, height }) => {
@@ -63,11 +54,9 @@ But this does not work, because the `render` function has an `imageSource` varia
     }}
   />
 </ColorDropper>
-...
 ```
 
 ```svelte
-...
 const colors = ['tomato', 'goldenrod', 'mediumturquoise'];
 
 <ColorDropper useProxyCanvas>
@@ -85,11 +74,9 @@ const colors = ['tomato', 'goldenrod', 'mediumturquoise'];
     />
   {/each}
 </ColorDropper>
-...
 ```
 
 ```svelte
-...
 <ColorDropper useWorker>
   <Layer
     render={({ ctx }) => {
@@ -102,5 +89,4 @@ const colors = ['tomato', 'goldenrod', 'mediumturquoise'];
     }}
   />
 </ColorDropper>
-...
 ```

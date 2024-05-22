@@ -3,7 +3,7 @@
 
   import Canvas from './Canvas.svelte';
   import ColorPicker from './ColorPicker.svelte';
-  import ColorCircle from './ColorCircle.svelte';
+  import Cursor from './Cursor.svelte';
 
   import { RenderManager, RenderWorker, type AppContext, GeometryManager } from '../model';
   import { KEY } from '../lib';
@@ -75,7 +75,7 @@
     </span>
     <strong class="selected-color">{$selectedColor}</strong>
   </div>
-  <ColorCircle isActive={isEntered && needsPickColor} />
+  <Cursor isActive={isEntered && needsPickColor} />
   <Canvas
     {style}
     {width}

@@ -1,7 +1,7 @@
 # Color Dropper
 
 [Demo](https://color-dropper-ivory.vercel.app/) \
-[Sandbox]([https://color-dropper-ivory.vercel.app/](https://stackblitz.com/~/github.com/rejth/color-dropper))
+[Sandbox](https://color-dropper-ivory.vercel.app/](https://stackblitz.com/~/github.com/rejth/color-dropper)
 
 ## Recommended IDE Setup
 

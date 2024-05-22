@@ -9,7 +9,9 @@ const settings: CanvasRenderingContext2DSettings = {
   alpha: false,
 };
 
-/** A list of canvas context setters that we do not need to use on the offscreen canvas, so this allows to optimize rendering */
+/**
+ * A list of canvas context setters that we do not need to use on the offscreen canvas, so this allows to optimize rendering.
+ * */
 const EXCLUDED_SETTERS: Array<keyof HitCanvasRenderingContext2D> = [
   'shadowBlur',
   'globalCompositeOperation',
@@ -20,7 +22,7 @@ const EXCLUDED_SETTERS: Array<keyof HitCanvasRenderingContext2D> = [
  * Under the hood, we proxy all CanvasRenderingContext2D methods to a second, offscreen canvas.
  * When an event occurs on the main canvas, the color of the pixel at the event coordinates is read from the offscreen canvas and converted to HEX color code.
  * Also, this approach can be useful for identifying the corresponding layer using a unique fill and stroke color and then re-dispatch an event to the Layer component.
- * In general, multiple layered canvases for complex scenes is a possible optimization when some objects need to move or change frequently, while others remain relatively static.
+ * Layer management is not implemented yet.
  */
 export function createHitCanvas(
   canvas: HTMLCanvasElement,

@@ -14,7 +14,7 @@ Cache various image sizes on an offscreen canvas when loading instead of constan
 
 ## Current technical issues
 
-The `ColorDropper` component does not work properly with Workers right now because of a function serialization problem. \
+In some cases, the `ColorDropper` component does not work properly with Workers because of a function serialization problem. \
 When we register a new worker via the `useWorker` property, we need to serialize and deserialize data for transferring between threads. \
 This is where the problem with `render` functions and their closures comes up. \
 Serialization works correctly only for functions without closures.

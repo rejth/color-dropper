@@ -30,14 +30,13 @@ For example, this works correctly, because the `render` function does not have a
 </ColorDropper>
 ```
 
-But this does not work, because the `render` function has an `imageSource` variable in the closure:
+But this does not work, because the `render` function has a `doSomething` function and `variable` in the closure:
 
 ```svelte
 <ColorDropper useWorker>
   <Layer
     render={({ ctx }) => {
-      if (!imageSource) return;
-      ctx.drawImage(imageSource, 0, 0, width, height);
+      doSomething(variable)
     }}
   />
 </ColorDropper>

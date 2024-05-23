@@ -21,9 +21,10 @@ export interface Render {
 }
 
 export type RenderProps = {
-  ctx: CanvasContextType;
+  context: CanvasContextType;
   width: number;
   height: number;
+  imageSource?: CanvasImageSource;
 };
 
 export interface HitCanvasRenderingContext2D extends Omit<CanvasRenderingContext2D, 'canvas'> {
@@ -58,6 +59,7 @@ export type WorkerEvent = {
   action: WorkerAction;
   canvas: OffscreenCanvas;
   drawers: string;
+  imageSource: CanvasImageSource;
   x: number;
   y: number;
   width: number;

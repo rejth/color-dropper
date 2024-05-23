@@ -39,11 +39,12 @@
    * Consider using "willReadFrequently: true" setting in the contextSettings property if you are going to use frequent read-back operations via getImageData().
    */
   export let useProxyCanvas = false;
+  export let imageSource: CanvasImageSource | null = null;
 
   const geometryManager = new GeometryManager();
   const renderManager = useWorker
-    ? new RenderWorker(geometryManager)
-    : new RenderManager(geometryManager);
+    ? new RenderWorker(geometryManager, imageSource)
+    : new RenderManager(geometryManager, useProxyCanvas, imageSource);
 
   setContext<AppContext>(KEY, {
     renderManager,
@@ -82,7 +83,6 @@
     {height}
     {pixelRatio}
     {contextSettings}
-    {useProxyCanvas}
     isActive={needsPickColor}
     on:mouseenter={onEnter}
     on:mouseleave={onLeave}

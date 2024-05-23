@@ -21,6 +21,7 @@ export class RenderManager {
   context: CanvasRenderingContext2D | HitCanvasRenderingContext2D | null;
   geometryManager: GeometryManager;
 
+  imageSource:  CanvasImageSource | null;
   imageData: ImageData | null;
   drawers: Map<LayerId, Render>;
   needsRedraw: boolean;
@@ -30,27 +31,23 @@ export class RenderManager {
   selectedColor: Writable<HEX> = writable(BLACK);
   cursor: Writable<CursorState> = writable({ x: 0, y: 0, color: BLACK });
 
-  constructor(geometryManager: GeometryManager) {
+  constructor(geometryManager: GeometryManager, useProxyCanvas: boolean, imageSource: CanvasImageSource | null = null) {
     this.canvas = null;
     this.context = null;
     this.imageData = null;
     this.drawers = new Map();
     this.needsRedraw = true;
     this.needsCacheImage = true;
-    this.useProxyCanvas = false;
+    this.useProxyCanvas = useProxyCanvas;
     this.geometryManager = geometryManager;
+    this.imageSource = imageSource;
     this.render = this.render.bind(this);
   }
 
-  init(
-    canvas: HTMLCanvasElement,
-    useProxyCanvas: boolean,
-    contextSettings: CanvasRenderingContext2DSettings | undefined,
-  ) {
+  init(canvas: HTMLCanvasElement, contextSettings: CanvasRenderingContext2DSettings | undefined) {
     this.canvas = canvas;
-    this.useProxyCanvas = useProxyCanvas;
 
-    if (useProxyCanvas) {
+    if (this.useProxyCanvas) {
       this.context = createHitCanvas(canvas, contextSettings);
     } else {
       this.context = canvas.getContext('2d', contextSettings);
@@ -80,6 +77,7 @@ export class RenderManager {
     const width = this.width!;
     const height = this.height!;
     const pixelRatio = this.pixelRatio!;
+    const imageSource = this.imageSource!
 
     /**
      * Render canvas when width, height or pixelRatio change.
@@ -90,7 +88,7 @@ export class RenderManager {
     context.clearRect(0, 0, width, height);
 
     this.drawers.forEach((draw) => {
-      draw({ ctx: context, width, height });
+      draw({ context, width, height, imageSource });
     });
 
     /**

@@ -11,6 +11,7 @@ let height: number | null = null;
 let pixelRatio: number | null = null;
 let frame: number | null = null;
 let needsRedraw = true;
+let imageSource: CanvasImageSource | null = null;
 
 /**
  * Offscreen canvas settings for rendering optimization.
@@ -42,7 +43,12 @@ function render() {
     context.clearRect(0, 0, width, height);
 
     drawers.forEach((draw) => {
-      draw({ ctx: context!, width: width!, height: height! });
+      draw({
+        context: context!,
+        width: width!,
+        height: height!,
+        imageSource: imageSource!
+      });
     });
 
     needsRedraw = false;
@@ -60,6 +66,7 @@ self.onmessage = function (e: MessageEvent<WorkerEvent>) {
     case WorkerActionEnum.INIT:
       offscreenCanvas = e.data.canvas;
       context = offscreenCanvas.getContext('2d', settings);
+      imageSource = e.data.imageSource;
 
       drawers = parseDrawers(e.data.drawers);
       width = e.data.width;

@@ -18,6 +18,7 @@ export class RenderWorker {
   pixelRatio?: number;
 
   canvas: HTMLCanvasElement | null;
+  imageSource:  CanvasImageSource | null;
   worker: Worker;
   geometryManager: GeometryManager;
 
@@ -25,14 +26,15 @@ export class RenderWorker {
   selectedColor: Writable<string> = writable(BLACK);
   cursor: Writable<CursorState> = writable({ x: 0, y: 0, color: BLACK });
 
-  constructor(geometryManager: GeometryManager) {
+  constructor(geometryManager: GeometryManager, imageSource: CanvasImageSource | null = null) {
     /**
      * Register a worker allowing to perform intensive operations without blocking the main thread.
      * But data transfering (image data back to the main thread frequently) can introduce overhead and latency due to the serialization and deserialization of data.
      */
     this.worker = new Worker();
-    this.geometryManager = geometryManager;
     this.canvas = null;
+    this.imageSource = imageSource;
+    this.geometryManager = geometryManager;
 
     this.drawers.subscribe(() => {
       this.update();
@@ -51,6 +53,7 @@ export class RenderWorker {
       {
         action: WorkerActionEnum.INIT,
         canvas: offscreenCanvas,
+        imageSource: this.imageSource,
         drawers: this.stringifyDrawers(),
         width: this.width,
         height: this.height,

@@ -30,11 +30,11 @@
       <Spinner />
     </div>
   {:else}
-    <ColorDropper useProxyCanvas>
+    <ColorDropper useWorker {imageSource}>
       <Layer
-        render={({ ctx, width, height }) => {
+        render={({ context, width, height, imageSource }) => {
           if (!imageSource) return;
-          ctx.drawImage(imageSource, 0, 0, width, height);
+          context.drawImage(imageSource, 0, 0, width, height);
         }}
       />
     </ColorDropper>

@@ -7,6 +7,10 @@
 
 [VS Code](https://code.visualstudio.com/) + [Svelte](https://marketplace.visualstudio.com/items?itemName=svelte.svelte-vscode).
 
+## Possible imporevements
+1. Implement `image` mode for the `ColorDropper` when only images are processed in the `ColorDropper` component. This will allow the loading and drawing of the images in a Worker.
+2. Don't scale images in `drawImage`. Cache various image sizes on an offscreen canvas when loading instead of constantly scaling them in drawImage().
+
 ## Current technical issues
 
 The `ColorDropper` component does not work properly with Workers right now because of a function serialization problem. \

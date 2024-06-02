@@ -21,7 +21,7 @@ export class RenderManager {
   context: CanvasRenderingContext2D | HitCanvasRenderingContext2D | null;
   geometryManager: GeometryManager;
 
-  imageSource:  CanvasImageSource | null;
+  imageSource: CanvasImageSource | null;
   imageData: ImageData | null;
   drawers: Map<LayerId, Render>;
   needsRedraw: boolean;
@@ -31,7 +31,11 @@ export class RenderManager {
   selectedColor: Writable<HEX> = writable(BLACK);
   cursor: Writable<CursorState> = writable({ x: 0, y: 0, color: BLACK });
 
-  constructor(geometryManager: GeometryManager, useProxyCanvas: boolean, imageSource: CanvasImageSource | null = null) {
+  constructor(
+    geometryManager: GeometryManager,
+    useProxyCanvas: boolean,
+    imageSource: CanvasImageSource | null = null,
+  ) {
     this.canvas = null;
     this.context = null;
     this.imageData = null;
@@ -77,7 +81,7 @@ export class RenderManager {
     const width = this.width!;
     const height = this.height!;
     const pixelRatio = this.pixelRatio!;
-    const imageSource = this.imageSource!
+    const imageSource = this.imageSource!;
 
     /**
      * Render canvas when width, height or pixelRatio change.
@@ -93,7 +97,7 @@ export class RenderManager {
 
     /**
      * Cache canvas image data to avoid heavy frequent read-back operations via getImageData().
-    */
+     */
     if (this.needsCacheImage && width > 0 && height > 0) {
       this.imageData = context.getImageData(0, 0, width * pixelRatio, height * pixelRatio);
       this.needsCacheImage = false;

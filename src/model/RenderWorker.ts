@@ -18,7 +18,7 @@ export class RenderWorker {
   pixelRatio?: number;
 
   canvas: HTMLCanvasElement | null;
-  imageSource:  CanvasImageSource | null;
+  imageSource: CanvasImageSource | null;
   worker: Worker;
   geometryManager: GeometryManager;
 
@@ -29,7 +29,7 @@ export class RenderWorker {
   constructor(geometryManager: GeometryManager, imageSource: CanvasImageSource | null = null) {
     /**
      * Register a worker allowing to perform intensive operations without blocking the main thread.
-     * But data transfering (image data back to the main thread frequently) can introduce overhead and latency due to the serialization and deserialization of data.
+     * But data transferring (image data back to the main thread frequently) can introduce overhead and latency due to the serialization and deserialization of data.
      */
     this.worker = new Worker();
     this.canvas = null;

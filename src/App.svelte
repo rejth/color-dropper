@@ -16,7 +16,7 @@
       /**
        * ImageBitmaps can be transferred between different contexts (e.g., between the main thread and web workers)
        * without copying the image data, which saves memory and improves performance.
-       * Also the trendering process is quicker compared to directly using other image objects like HTMLImageElement.
+       * Also the rendering process is quicker compared to directly using other image objects like HTMLImageElement.
        */
       const imageBitmap = await createImageBitmap(image);
       imageSource = imageBitmap;

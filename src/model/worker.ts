@@ -36,8 +36,8 @@ function render() {
   pixelRatio = pixelRatio!;
 
   /**
-  * Render canvas when width, height or pixelRatio change.
-  */
+   * Render canvas when width, height or pixelRatio change.
+   */
   if (needsRedraw) {
     context.setTransform(pixelRatio, 0, 0, pixelRatio, 0, 0);
     context.clearRect(0, 0, width, height);
@@ -47,7 +47,7 @@ function render() {
         context: context!,
         width: width!,
         height: height!,
-        imageSource: imageSource!
+        imageSource: imageSource!,
       });
     });
 

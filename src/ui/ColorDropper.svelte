@@ -18,7 +18,7 @@
   export let height: number | null = null;
   /**
    * If pixelRatio is unset, the canvas uses devicePixelRatio binding to match the window’s pixel dens.
-   * If pixelRatio is set to "auto", we will utomatically calculate the maximum supported pixel ratio based on the browser and canvas size.
+   * If pixelRatio is set to "auto", we will automatically calculate the maximum supported pixel ratio based on the browser and canvas size.
    * This can be particularly useful when rendering large canvases on iOS Safari (https://pqina.nl/blog/canvas-area-exceeds-the-maximum-limit/)
    */
   export let pixelRatio: 'auto' | number | null = null;

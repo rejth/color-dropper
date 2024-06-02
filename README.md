@@ -9,8 +9,8 @@
 
 ## Possible improvements
 
-1. Don't scale images in `drawImage()`. Cache various image sizes on an offscreen canvas when loading instead of constantly scaling them in `drawImage()`.
-2. Mobile friendliness.
+1. Don't scale images in `drawImage()`. \
+   Cache various image sizes on an offscreen canvas when loading instead of constantly scaling them in `drawImage()`.
 
 ## Current technical issues
 
@@ -42,7 +42,7 @@ But this does not work, because the `render` function has a `doSomething` functi
 <ColorDropper useWorker>
   <Layer
     render={({ context }) => {
-      doSomething(variable)
+      doSomething(variable);
     }}
   />
 </ColorDropper>

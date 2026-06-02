@@ -1,0 +1,14 @@
+{
+  "$schema": "./node_modules/oxlint/configuration_schema.json",
+  "plugins": ["import", "typescript", "jest", "oxc"],
+  "rules": {
+    "no-console": "off",
+    "no-debugger": "error"
+  },
+  "env": {
+    "browser": true,
+    "es2022": true,
+    "svelte": true
+  },
+  "ignorePatterns": ["src/wasm/**", "storybook-static/**"]
+}

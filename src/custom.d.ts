@@ -1,1 +1,1 @@
-declare module 'json-fn';
+declare module 'json-fn'

@@ -1,46 +1,48 @@
-import JSONfn from 'json-fn';
-import { WorkerActionEnum, type LayerId, type Render, type WorkerEvent } from '.';
-import { pickColor } from '../lib';
+import JSONfn from 'json-fn'
 
-let offscreenCanvas: OffscreenCanvas | null = null;
-let context: OffscreenCanvasRenderingContext2D | null = null;
-let drawers: Map<LayerId, Render> = new Map();
+import { pickColor } from '../lib'
 
-let width: number | null = null;
-let height: number | null = null;
-let pixelRatio: number | null = null;
-let frame: number | null = null;
-let needsRedraw = true;
-let imageSource: CanvasImageSource | null = null;
+import { type LayerId, type Render, WorkerActionEnum, type WorkerEvent } from '.'
+
+let offscreenCanvas: OffscreenCanvas | null = null
+let context: OffscreenCanvasRenderingContext2D | null = null
+let drawers: Map<LayerId, Render> = new Map()
+
+let width: number | null = null
+let height: number | null = null
+let pixelRatio: number | null = null
+let frame: number | null = null
+let needsRedraw = true
+let imageSource: CanvasImageSource | null = null
 
 /**
  * Offscreen canvas settings for rendering optimization.
  */
 const settings: CanvasRenderingContext2DSettings = {
   willReadFrequently: true,
-};
+}
 
 function startRenderLoop() {
-  render();
-  frame = requestAnimationFrame(() => startRenderLoop());
+  render()
+  frame = requestAnimationFrame(() => startRenderLoop())
 }
 
 /**
  * The main render function which is responsible for drawing, clearing and canvas's transformation matrix adjustment.
  * */
 function render() {
-  if (!context) return;
+  if (!context) return
 
-  width = width!;
-  height = height!;
-  pixelRatio = pixelRatio!;
+  width = width!
+  height = height!
+  pixelRatio = pixelRatio!
 
   /**
    * Render canvas when width, height or pixelRatio change.
    */
   if (needsRedraw) {
-    context.setTransform(pixelRatio, 0, 0, pixelRatio, 0, 0);
-    context.clearRect(0, 0, width, height);
+    context.setTransform(pixelRatio, 0, 0, pixelRatio, 0, 0)
+    context.clearRect(0, 0, width, height)
 
     drawers.forEach((draw) => {
       draw({
@@ -48,68 +50,68 @@ function render() {
         width: width!,
         height: height!,
         imageSource: imageSource!,
-      });
-    });
+      })
+    })
 
-    needsRedraw = false;
+    needsRedraw = false
   }
 }
 
 function parseDrawers(drawers: string): Map<LayerId, Render> {
-  return new Map(JSONfn.parse(drawers));
+  return new Map(JSONfn.parse(drawers))
 }
 
 self.onmessage = function (e: MessageEvent<WorkerEvent>) {
-  const { action } = e.data;
+  const { action } = e.data
 
   switch (action) {
     case WorkerActionEnum.INIT:
-      offscreenCanvas = e.data.canvas;
-      context = offscreenCanvas.getContext('2d', settings);
-      imageSource = e.data.imageSource;
+      offscreenCanvas = e.data.canvas
+      context = offscreenCanvas.getContext('2d', settings)
+      imageSource = e.data.imageSource
 
-      drawers = parseDrawers(e.data.drawers);
-      width = e.data.width;
-      height = e.data.height;
-      pixelRatio = e.data.pixelRatio;
+      drawers = parseDrawers(e.data.drawers)
+      width = e.data.width
+      height = e.data.height
+      pixelRatio = e.data.pixelRatio
 
-      startRenderLoop();
+      startRenderLoop()
 
-      break;
+      break
     case WorkerActionEnum.RESIZE:
-      if (!e.data.width || !e.data.height) break;
-      drawers = parseDrawers(e.data.drawers);
-      width = e.data.width;
-      height = e.data.height;
-      pixelRatio = e.data.pixelRatio;
+      if (!e.data.width || !e.data.height) break
+      drawers = parseDrawers(e.data.drawers)
+      width = e.data.width
+      height = e.data.height
+      pixelRatio = e.data.pixelRatio
 
       if (offscreenCanvas) {
-        offscreenCanvas.width = width * pixelRatio;
-        offscreenCanvas.height = height * pixelRatio;
+        offscreenCanvas.width = width * pixelRatio
+        offscreenCanvas.height = height * pixelRatio
       }
 
-      needsRedraw = true;
-      break;
+      needsRedraw = true
+      break
     case WorkerActionEnum.UPDATE:
-      drawers = parseDrawers(e.data.drawers);
-      break;
+      drawers = parseDrawers(e.data.drawers)
+      break
     case WorkerActionEnum.GET_COLOR:
       self.postMessage({
         action: WorkerActionEnum.GET_COLOR,
         color: pickColor(offscreenCanvas!, context!, e.data.x, e.data.y),
         cursorPosition: e.data.cursorPosition,
-      });
-      break;
+      })
+      break
     case WorkerActionEnum.PICK_COLOR:
       self.postMessage({
         action: WorkerActionEnum.PICK_COLOR,
         color: pickColor(offscreenCanvas!, context!, e.data.x, e.data.y),
         cursorPosition: e.data.cursorPosition,
-      });
-      break;
+      })
+      break
   }
-};
+}
 
 self.addEventListener('close', () => {
-  cancelAnimationFrame(frame!);
-});
+  cancelAnimationFrame(frame!)
+})

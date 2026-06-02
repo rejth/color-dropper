@@ -1,12 +1,13 @@
 <script lang="ts">
-  import { getContext } from 'svelte';
-  import { type AppContext } from '../model';
-  import { BLACK, KEY, WHITE } from '../lib';
+import { getContext } from 'svelte'
 
-  export let isActive: boolean;
+import { BLACK, KEY, WHITE } from '../lib'
+import { type AppContext } from '../model'
 
-  const { renderManager } = getContext<AppContext>(KEY);
-  const { cursor } = renderManager;
+export let isActive: boolean
+
+const { renderManager } = getContext<AppContext>(KEY)
+const { cursor } = renderManager
 </script>
 
 <div class="cursor-wrapper" class:active={isActive}>

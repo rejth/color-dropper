@@ -9,35 +9,28 @@
     "preview": "vite preview",
     "check": "svelte-check --tsconfig ./tsconfig.json",
     "check:watch": "svelte-check --tsconfig ./tsconfig.json --watch",
-    "lint": "prettier --check . && eslint .",
-    "format": "prettier --write .",
+    "lint:check": "npx oxlint src",
+    "lint:fix": "npx oxlint src --fix",
+    "format:fix": "biome format --write src",
+    "format:check": "biome check --write src",
     "check-updates": "npx npm-check-updates",
     "update-packages": "npx npm-check-updates -u",
     "prepare": "husky"
   },
   "lint-staged": {
-    "*.{js,ts,svelte}": [
-      "npm run format",
-      "npm run lint"
-    ],
-    "*.{css,scss,json,svg,js,cjs,html,md}": "prettier --write --ignore-unknown"
+    "*.{js,ts,svelte}": ["npx biome format --write", "npx oxlint src"],
+    "*.{css,scss,json,svg,js,cjs,html,md}": "npx biome format --write"
   },
   "devDependencies": {
+    "@biomejs/biome": "^2.4.16",
     "@sveltejs/vite-plugin-svelte": "^3.1.0",
     "@tsconfig/svelte": "^5.0.4",
     "@types/canvas-size": "^1.2.2",
     "@types/uuid": "^9",
-    "@typescript-eslint/eslint-plugin": "^7.9.0",
-    "@typescript-eslint/parser": "^7.9.0",
-    "eslint": "^8.55.0",
-    "eslint-config-prettier": "^9.1.0",
-    "eslint-plugin-prettier": "^5.0.1",
-    "eslint-plugin-svelte": "^2.35.1",
     "husky": "^9.0.11",
     "lint-staged": "^15.2.5",
     "npm-check-updates": "^16.14.20",
-    "prettier": "^3.2.5",
-    "prettier-plugin-svelte": "^3.2.3",
+    "oxlint": "^1.57.0",
     "svelte": "^4.2.17",
     "svelte-check": "^3.7.1",
     "tslib": "^2.6.2",

@@ -1,70 +1,70 @@
 <script lang="ts">
-  import { setContext } from 'svelte';
+import { setContext } from 'svelte'
 
-  import Canvas from './Canvas.svelte';
-  import ColorPicker from './ColorPicker.svelte';
-  import Cursor from './Cursor.svelte';
+import { KEY } from '../lib'
+import { type AppContext, GeometryManager, RenderManager, RenderWorker } from '../model'
 
-  import { RenderManager, RenderWorker, type AppContext, GeometryManager } from '../model';
-  import { KEY } from '../lib';
+import Canvas from './Canvas.svelte'
+import ColorPicker from './ColorPicker.svelte'
+import Cursor from './Cursor.svelte'
 
-  /**
-   * When unset, the canvas will use its clientWidth property.
-   */
-  export let width: number | null = null;
-  /**
-   * When unset, the canvas will use its clientHeight property.
-   */
-  export let height: number | null = null;
-  /**
-   * If pixelRatio is unset, the canvas uses devicePixelRatio binding to match the window’s pixel dens.
-   * If pixelRatio is set to "auto", we will automatically calculate the maximum supported pixel ratio based on the browser and canvas size.
-   * This can be particularly useful when rendering large canvases on iOS Safari (https://pqina.nl/blog/canvas-area-exceeds-the-maximum-limit/)
-   */
-  export let pixelRatio: 'auto' | number | null = null;
-  export let contextSettings: CanvasRenderingContext2DSettings | undefined = undefined;
-  export let style = '';
-  /**
-   * When useWorker is true, a worker with offscreen canvas will be registered to perform intensive operations without blocking the main thread.
-   * When useWorker is false, all operations will be performed in the main thread.
-   * If you specify the useWorker property, you do not need to specify the useProxyCanvas property below as the useWorker property forces using offscreen canvas by default.
-   */
-  export let useWorker = false;
-  /**
-   * When useProxyCanvas is true, we will proxy all CanvasRenderingContext2D methods to a second, offscreen canvas (in the main thread).
-   * This has a performance cost (rendering twice in the main thread), so it’s disabled by default.
-   * A proxy offscreen canvas, for example, can be useful for identifying the corresponding layer using a unique fill and stroke color and then re-dispatch an event to the Layer component.
-   *
-   * When useProxyCanvas is false, all operations will be performed on the main canvas.
-   * Consider using "willReadFrequently: true" setting in the contextSettings property if you are going to use frequent read-back operations via getImageData().
-   */
-  export let useProxyCanvas = false;
-  export let imageSource: CanvasImageSource | null = null;
+/**
+ * When unset, the canvas will use its clientWidth property.
+ */
+export let width: number | null = null
+/**
+ * When unset, the canvas will use its clientHeight property.
+ */
+export let height: number | null = null
+/**
+ * If pixelRatio is unset, the canvas uses devicePixelRatio binding to match the window’s pixel dens.
+ * If pixelRatio is set to "auto", we will automatically calculate the maximum supported pixel ratio based on the browser and canvas size.
+ * This can be particularly useful when rendering large canvases on iOS Safari (https://pqina.nl/blog/canvas-area-exceeds-the-maximum-limit/)
+ */
+export let pixelRatio: 'auto' | number | null = null
+export let contextSettings: CanvasRenderingContext2DSettings | undefined = undefined
+export let style = ''
+/**
+ * When useWorker is true, a worker with offscreen canvas will be registered to perform intensive operations without blocking the main thread.
+ * When useWorker is false, all operations will be performed in the main thread.
+ * If you specify the useWorker property, you do not need to specify the useProxyCanvas property below as the useWorker property forces using offscreen canvas by default.
+ */
+export let useWorker = false
+/**
+ * When useProxyCanvas is true, we will proxy all CanvasRenderingContext2D methods to a second, offscreen canvas (in the main thread).
+ * This has a performance cost (rendering twice in the main thread), so it’s disabled by default.
+ * A proxy offscreen canvas, for example, can be useful for identifying the corresponding layer using a unique fill and stroke color and then re-dispatch an event to the Layer component.
+ *
+ * When useProxyCanvas is false, all operations will be performed on the main canvas.
+ * Consider using "willReadFrequently: true" setting in the contextSettings property if you are going to use frequent read-back operations via getImageData().
+ */
+export let useProxyCanvas = false
+export let imageSource: CanvasImageSource | null = null
 
-  const geometryManager = new GeometryManager();
-  const renderManager = useWorker
-    ? new RenderWorker(geometryManager, imageSource)
-    : new RenderManager(geometryManager, useProxyCanvas, imageSource);
+const geometryManager = new GeometryManager()
+const renderManager = useWorker
+  ? new RenderWorker(geometryManager, imageSource)
+  : new RenderManager(geometryManager, useProxyCanvas, imageSource)
 
-  setContext<AppContext>(KEY, {
-    renderManager,
-  });
+setContext<AppContext>(KEY, {
+  renderManager,
+})
 
-  const { selectedColor } = renderManager;
-  let isEntered = false;
-  let needsPickColor = false;
+const { selectedColor } = renderManager
+let isEntered = false
+let needsPickColor = false
 
-  const onEnter = () => {
-    isEntered = true;
-  };
+const onEnter = () => {
+  isEntered = true
+}
 
-  const onLeave = () => {
-    isEntered = false;
-  };
+const onLeave = () => {
+  isEntered = false
+}
 
-  const onPickerClick = () => {
-    needsPickColor = !needsPickColor;
-  };
+const onPickerClick = () => {
+  needsPickColor = !needsPickColor
+}
 </script>
 
 <div class="color-dropper">
